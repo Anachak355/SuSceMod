@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Aug  6 08:07:39 2024
-
-@author: Administrator
-"""
-
 import logging
 import os
 import sys

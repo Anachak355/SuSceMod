@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-@author: Anasua Chakraborty
-"""
-
 import numpy as np
 import pandas as pd
 from sklearn.metrics import cohen_kappa_score

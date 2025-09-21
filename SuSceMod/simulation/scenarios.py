@@ -1,15 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Aug  4 11:36:31 2024
-
-@author: Administrator
-"""
-
 import numpy as np
 import os
-
-# simulations.py
-import numpy as np
 
 def update_built_up_map(built_up_map, prob_maps_dict, annual_rates,
                         rng=None, randomness="gumbel", tau=0.1):

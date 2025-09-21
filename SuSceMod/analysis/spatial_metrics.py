@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-@author: Anasua Chakraborty
-"""
-
 import rasterio
 import numpy as np
 import pandas as pd
@@ -11,7 +6,6 @@ from math import log2
 
 
 def read_raster(file_path):
-
     with rasterio.open(file_path) as src:
         raster = src.read(1)
         # Mask the NaN values to ignore them during the calculations
@@ -19,7 +13,6 @@ def read_raster(file_path):
         return valid_raster, src.transform
     
 def calculate_urban_sprawled_index(raster):
-
     non_nan_cells = np.count_nonzero(~raster.mask)
     unique, counts = np.unique(raster.compressed(), return_counts=True)
     proportions = counts / non_nan_cells
@@ -27,7 +20,6 @@ def calculate_urban_sprawled_index(raster):
     return usi
 
 def calculate_shannon_entropy(raster, num_classes=4):
-
     total_cells = raster.size
     entropy = 0
     for class_value in range(num_classes):

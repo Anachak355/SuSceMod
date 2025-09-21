@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -13,5 +13,16 @@ authors = [
 ]
 dependencies = [
   "numpy",
-  "pandas"
+  "pandas",
+  "rasterio",
+  "matplotlib",
+  "seaborn",
+  "openpyxl",
+  "tabulate",
+  "scikit-learn",
+  "scikit-image"
+  "gdal"
 ]
+
+[tool.setuptools]
+packages = { find = { where = ["."], include = ["SuSceMod*"] } }
