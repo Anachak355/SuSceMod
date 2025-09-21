@@ -1,5 +1,5 @@
 import numpy as np
-import input_handling as inp
+from . import input_handling
 
 def neighborhood_counts_for_targets(built_up_map, target_classes):
     """
@@ -217,8 +217,8 @@ def check_decimals(current_demands_exp_central, current_demands_exp_non_central,
     return current_demands_exp_central, current_demands_exp_non_central, current_demands_dens_central, current_demands_dens_non_central
 
 def extrapolate_demand_yearly(parent_raster_folder, zoning_type, change_years):
-    annual_change_rates_exp_1, annual_change_rates_dens_1 = inp.calculate_change_rates(parent_raster_folder, zoning_type, change_years[0])
-    annual_change_rates_exp_2, annual_change_rates_dens_2 = inp.calculate_change_rates(parent_raster_folder, zoning_type, change_years[1])
+    annual_change_rates_exp_1, annual_change_rates_dens_1 = input_handling.calculate_change_rates(parent_raster_folder, zoning_type, change_years[0])
+    annual_change_rates_exp_2, annual_change_rates_dens_2 = input_handling.calculate_change_rates(parent_raster_folder, zoning_type, change_years[1])
     
     decrease_rates_exp = [(a-b)/10 for a, b in zip(annual_change_rates_exp_1, annual_change_rates_exp_2)]
     decrease_rates_dens = [(a-b)/10 for a, b in zip(annual_change_rates_dens_1, annual_change_rates_dens_2)]
@@ -226,8 +226,8 @@ def extrapolate_demand_yearly(parent_raster_folder, zoning_type, change_years):
     return decrease_rates_exp, decrease_rates_dens
 
 def extrapolate_demand(parent_raster_folder, zoning_type, change_years):
-    annual_change_rates_exp_1, annual_change_rates_dens_1 = inp.calculate_change_rates(parent_raster_folder, zoning_type, change_years[0])
-    annual_change_rates_exp_2, annual_change_rates_dens_2 = inp.calculate_change_rates(parent_raster_folder, zoning_type, change_years[1])
+    annual_change_rates_exp_1, annual_change_rates_dens_1 = input_handling.calculate_change_rates(parent_raster_folder, zoning_type, change_years[0])
+    annual_change_rates_exp_2, annual_change_rates_dens_2 = input_handling.calculate_change_rates(parent_raster_folder, zoning_type, change_years[1])
     
     decrease_rates_exp = [(a-b) for a, b in zip(annual_change_rates_exp_1, annual_change_rates_exp_2)]
     decrease_rates_dens = [(a-b) for a, b in zip(annual_change_rates_dens_1, annual_change_rates_dens_2)]

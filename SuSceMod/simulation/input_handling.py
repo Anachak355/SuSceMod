@@ -3,7 +3,7 @@ import re
 from typing import Dict, Tuple
 import numpy as np
 import pandas as pd
-import data_utilities as utils  # uses utils.load_raster_data
+from . import data_utilities as utils
 
 _SUITABILITY_REGEX = re.compile(
     r"suitability.*?ref(\d+)_to_(\d+(?:\.\d+)?)", re.IGNORECASE

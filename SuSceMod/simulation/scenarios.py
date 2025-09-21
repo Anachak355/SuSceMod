@@ -1,5 +1,6 @@
 import numpy as np
 import os
+from . import core_functions
 
 def update_built_up_map(built_up_map, prob_maps_dict, annual_rates,
                         rng=None, randomness="gumbel", tau=0.1):
@@ -9,14 +10,13 @@ def update_built_up_map(built_up_map, prob_maps_dict, annual_rates,
       - "jitter": scores = pot + Normal(0, tau * max(pot))
     tau: noise scale; try 0.05–0.2 for your potential range.
     """
-    from core_functions import calc_transition_potentials, calc_eligible_indices_generic
 
     if rng is None:
         rng = np.random.default_rng(42)
 
     new_map = built_up_map.copy()
     # 1) base potentials
-    potentials = calc_transition_potentials(new_map, prob_maps_dict)
+    potentials = core_functions.calc_transition_potentials(new_map, prob_maps_dict)
 
     # 2) add noise to create "scores" used for ranking
     noisy = {}
@@ -32,7 +32,7 @@ def update_built_up_map(built_up_map, prob_maps_dict, annual_rates,
             noisy[key] = pot  # deterministic
 
     # 3) eligible donors sorted by descending *noisy* score
-    elig = calc_eligible_indices_generic(new_map, noisy, annual_rates, sort=True)
+    elig = core_functions.calc_eligible_indices_generic(new_map, noisy, annual_rates, sort=True)
 
     # 4) allocate (same as before)
     H, W = new_map.shape
