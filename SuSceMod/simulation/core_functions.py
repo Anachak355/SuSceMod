@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Aug  4 11:12:01 2024
-
-@author: Administrator
-"""
-
 import numpy as np
 import input_handling as inp
 
