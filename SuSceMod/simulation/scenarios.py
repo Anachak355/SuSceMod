@@ -2,8 +2,14 @@ import numpy as np
 import os
 from . import core_functions
 
-def update_built_up_map(built_up_map, prob_maps_dict, annual_rates,
-                        rng=None, randomness="gumbel", tau=0.1):
+def update_built_up_map(
+    built_up_map, 
+    prob_maps_dict, 
+    annual_rates,
+    rng=None, 
+    randomness="gumbel", 
+    tau=0.1
+):
     """
     randomness: "none" | "gumbel" | "jitter"
       - "gumbel": scores = pot + tau * Gumbel(0,1)
@@ -57,28 +63,25 @@ def update_built_up_map(built_up_map, prob_maps_dict, annual_rates,
 
     return new_map
 
-
-
-def simulate_growth_BAU(initial_year,
-                        final_year,
-                        initial_built_up_map, 
-                        prob_maps_dict,
-                        change_years,
-                        annual_rates,
-                        output_folder,
-                        parent_folder
-    ):
+def simulate_density_based_scenario(
+    initial_year,
+    final_year,
+    initial_built_up_map, 
+    prob_maps_dict,
+    change_years,
+    annual_rates,
+    output_folder,
+    parent_folder,
+    randomness
+):
     
     simulated_maps, output_paths, class_counts = {}, {}, {}
     
     current_built_up_map = initial_built_up_map.copy()
     
-    # import sys
-    # out = sys.__stdout__
-    
-    # print("\nDemands (cells/year):", file=out)
-    # for (i, j), rate in sorted(annual_rates.items()):
-    #     print(f"    -> {i} → {j}: {rate}", file=out)
+    print("\nDemands (cells/year):")
+    for (i, j), rate in sorted(annual_rates.items()):
+        print(f"    -> {i} → {j}: {rate}")
 
 
     for year in range(final_year - initial_year):
@@ -95,7 +98,7 @@ def simulate_growth_BAU(initial_year,
         rng = np.random.default_rng(2118)
         # Run simulation, save map, and overwrite previous year map
         updated_map = update_built_up_map(current_built_up_map, prob_maps_dict, annual_rates,
-                                  rng=rng, randomness="gumbel", tau=0.1)
+                                  rng=rng, randomness=randomness, tau=0.1)
         
         simulated_maps[current_year + 1] = updated_map
         current_built_up_map = updated_map
