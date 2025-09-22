@@ -7,3 +7,6 @@ This is the main engine for the simualtion. It has tools to load rasters, simula
 
 ### 📂 `analysis/`
 This folder contains Python scripts focused on analysis, visualization and accuracy assessment of simulated urban built-up data.
+
+### 📂 `simulation/`
+Examples for modelling for growth-based and density-based scenarios, using jupyter notebooks and example rasters
