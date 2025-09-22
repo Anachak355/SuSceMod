@@ -180,12 +180,48 @@ def calculate_change_rates(change_maps_dict, change_years, print_summary=True):
     # Annualize
     annual_change_rates = {k: round(v / years, 2) for k, v in period_counts.items()}
 
-    # if print_summary:
-    #     print("\nCrosstab (counts, incl. no-change on diagonal):")
-    #     print(crosstab_df)
-    #     print("\nAnnual change rates (cells/year):")
-    #     for (i, j), rate in sorted(annual_change_rates.items()):
-    #         print(f"    -> {i} → {j}: {rate}")
+    if print_summary:
+        print("\nCrosstab (counts, incl. no-change on diagonal):")
+        print(crosstab_df)
+        print("\nAnnual change rates (cells/year):")
+        for (i, j), rate in sorted(annual_change_rates.items()):
+            print(f"    -> {i} → {j}: {rate}")
 
     return annual_change_rates, period_counts, crosstab_df
 
+def calculate_change_rates_historical(change_maps_dict_1, change_maps_dict_2, change_years, print_summary=True):
+    if not isinstance(change_years, (list, tuple)) or len(change_years) != 3:
+        raise ValueError("change_years must be [start1, split, end2].")
+
+    start1, split, end2 = map(int, change_years)
+
+    # Use your existing function (no duplication)
+    annual_rates_1, _, _ = calculate_change_rates(
+        change_maps_dict_1, [start1, split], print_summary=False
+    )
+    annual_rates_2, period_counts_2, crosstab_df_2 = calculate_change_rates(
+        change_maps_dict_2, [split, end2], print_summary=False
+    )
+
+    # Decrease = positive drop from dict_1 → dict_2
+    all_keys = set(annual_rates_1).union(annual_rates_2)
+    change_rates = {}
+    for k in all_keys:
+        dec = round(annual_rates_2.get(k, 0.0) - annual_rates_1.get(k, 0.0), 2)
+        if dec < 0:
+            change_rates[k] = dec
+
+    if print_summary:
+        print(f"\nDict_2 crosstab (counts incl. diagonal) for {split}–{end2}:")
+        print(crosstab_df_2)
+        print("\nDict_2 annual change rates (cells/year):")
+        for (i, j), rate in sorted(annual_rates_2.items()):
+            print(f"    -> {i} → {j}: {rate}")
+        if change_rates:
+            print(f"\nChanges vs. dict_1 [{start1}–{split}] (cells/year):")
+            for (i, j), dec in sorted(change_rates.items()):
+                print(f"    ↓ {i} → {j}: {dec}")
+        else:
+            print(f"\nNo Changes vs. dict_1 [{start1}–{split}].")
+
+    return annual_rates_2, change_rates, period_counts_2, crosstab_df_2
