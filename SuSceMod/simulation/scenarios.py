@@ -68,10 +68,8 @@ def simulate_growth_based_scenario(
     final_year,
     initial_built_up_map, 
     prob_maps_dict,
-    change_years,
     annual_rates,
     output_folder,
-    parent_folder,
     randomness,
     seed=2118
 ): 
@@ -132,11 +130,9 @@ def simulate_density_based_scenario(
     final_year,
     initial_built_up_map, 
     prob_maps_dict,
-    change_years,
     annual_rates,
     differential_change_rates,
     output_folder,
-    parent_folder,
     randomness='gumbel',
     seed=2118
 ): 
