@@ -20,8 +20,7 @@ dependencies = [
   "openpyxl",
   "tabulate",
   "scikit-learn",
-  "scikit-image",
-  "GDAL>=3.6"
+  "scikit-image"
 ]
 
 [tool.setuptools]

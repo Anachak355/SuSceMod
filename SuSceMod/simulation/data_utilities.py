@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import rasterio
-from osgeo import gdal
 import csv
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap, BoundaryNorm
@@ -14,25 +13,13 @@ def load_raster_data(raster_path):
 
 def writeraster(template_raster_path, output_raster_path, lu_org):
     
-    gdal.UseExceptions()
-    gdal.PushErrorHandler('CPLQuietErrorHandler')
+    with rasterio.open(template_raster_path) as template_raster:
+        profile = template_raster.profile
     
-    template_raster = gdal.Open(template_raster_path)
-    output_raster = gdal.GetDriverByName('GTiff').Create(
-        output_raster_path,
-        template_raster.RasterXSize,
-        template_raster.RasterYSize,
-        1,
-        gdal.GDT_Float32,
-    )
-    output_raster.SetGeoTransform(template_raster.GetGeoTransform())
-    output_raster.SetProjection(template_raster.GetProjection())
+    profile.update(driver='GTiff', count=1, dtype='float32', nodata=np.nan)
     
-    output_band = output_raster.GetRasterBand(1)
-    output_band.WriteArray(lu_org.astype('float32'))
-    output_band.SetNoDataValue(np.nan)
-    output_raster = None
-    template_raster = None
+    with rasterio.open(output_raster_path, 'w', **profile) as output_raster:
+        output_raster.write(lu_org.astype('float32'), 1)
     
 def save_counts_to_csv(class_counts, filename):  
     counts = [class_counts[key][1] for key in class_counts.keys()]
