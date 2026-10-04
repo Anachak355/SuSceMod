@@ -83,6 +83,8 @@ def simulate_growth_based_scenario(
     for (i, j), rate in sorted(annual_rates.items()):
         print(f"    -> {i} → {j}: {rate}")
 
+    rng = np.random.default_rng(seed)
+
     for year in range(final_year - initial_year):
         # Remember previous simulation values to compare with new
         unique_old, counts_old = np.unique(current_built_up_map, return_counts=True)
@@ -93,8 +95,7 @@ def simulate_growth_based_scenario(
         print("\n###################################################################\n")
         print(f"Current year: {current_year}")
         print(f"Simulating for year: {current_year + 1}")
-            
-        rng = np.random.default_rng(seed)
+
         # Run simulation, save map, and overwrite previous year map
         updated_map = update_built_up_map(current_built_up_map, prob_maps_dict, annual_rates,
                                   rng=rng, randomness=randomness, tau=0.1)
@@ -169,6 +170,8 @@ def simulate_density_based_scenario(
     for (i, j), rate in sorted(preview_year2.items()):
         print(f"    -> {i} → {j}: {rate}")
 
+    rng = np.random.default_rng(seed)
+
     for year_idx in range(final_year - initial_year):
         # Choose rates for this simulation step
         use_rates = current_rates  # year_idx == 0 uses baseline; afterward it's already evolved
@@ -181,7 +184,6 @@ def simulate_density_based_scenario(
         print(f"Current year: {current_year}")
         print(f"Simulating for year: {current_year + 1}")
 
-        rng = np.random.default_rng(seed)
 
         # Run simulation for this step with the current (per-annum) rates
         updated_map = update_built_up_map(
