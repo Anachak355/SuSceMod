@@ -40,7 +40,7 @@ def update_built_up_map(
     # 3) eligible donors sorted by descending *noisy* score
     elig = core_functions.calc_eligible_indices_generic(new_map, noisy, annual_rates, sort=True)
 
-    # 4) allocate (same as before)
+    # 4) allocate
     H, W = new_map.shape
     assigned = np.zeros((H, W), dtype=bool)
     items = [((int(i), int(j)), max(0, int(round(v)))) for (i, j), v in annual_rates.items() if v > 0]
@@ -132,8 +132,8 @@ def simulate_density_based_scenario(
     initial_built_up_map, 
     prob_maps_dict,
     change_years,
-    annual_rates,          # baseline per-annum rates for year 1
-    differential_change_rates,        # treat as signed change per year (rename to change_rates if you like)
+    annual_rates,
+    differential_change_rates,
     output_folder,
     parent_folder,
     randomness='gumbel',
@@ -159,7 +159,7 @@ def simulate_density_based_scenario(
             nxt[k] = new_val
         return nxt
 
-    # Nice prints of baseline and the first "changed" rates (for Year 2)
+    # Print the baseline and the first changed rates
     print("\nDemands (cells/year) — Year 1 (baseline):")
     for (i, j), rate in sorted(current_rates.items()):
         print(f"    -> {i} → {j}: {rate}")
@@ -218,7 +218,7 @@ def simulate_density_based_scenario(
         # Store class counts
         class_counts[current_year + 1] = [unique, counts]
 
-        # Evolve the rates for the *next* year (so Year 2 uses changed rates, Year 3 uses changed twice, etc.)
+        # Evolve the rates for the next year
         current_rates = step_rates(current_rates, delta_rates)
 
     return simulated_maps, output_paths, class_counts
