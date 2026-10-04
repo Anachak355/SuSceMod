@@ -11,7 +11,7 @@ def neighborhood_counts_for_targets(built_up_map, target_classes):
     """
     counts_by_class = {}
     H, W = built_up_map.shape
-    a = built_up_map.astype(np.int32, copy=False)
+    a = np.nan_to_num(built_up_map, nan=-9999).astype(np.int32)
 
     for j in sorted(set(int(x) for x in target_classes)):
         # Binary mask for class j
@@ -58,7 +58,7 @@ def calc_transition_potentials(built_up_map, prob_maps_dict):
     for (i, j), prob in prob_maps_dict.items():
         i = int(i); j = int(j)
         # Donor mask: only cells currently in class i and valid
-        donor_mask = (valid & (a.astype(np.int32) == i))
+        donor_mask = (valid & (np.nan_to_num(a, nan=-9999).astype(np.int32) == i))
 
         # Probabilities: treat NaN/±inf as 0
         p = np.nan_to_num(prob, nan=0.0, posinf=0.0, neginf=0.0).astype(np.float32, copy=False)
@@ -105,7 +105,7 @@ def calc_eligible_indices_generic(built_up_map, potentials, annual_rates, sort=T
     """
     a = built_up_map
     valid = ~np.isnan(a)
-    a_int = a.astype(np.int32, copy=False)
+    a_int = np.nan_to_num(a, nan=-9999).astype(np.int32)
 
     elig = {}
     for (i, j), rate in annual_rates.items():
