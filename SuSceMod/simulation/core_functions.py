@@ -89,7 +89,7 @@ def calc_transition_acceptance(trans_pot_arrays):
     
     return trans_bool_exp, trans_bool_dens
 
-def calc_eligible_indices_generic(built_up_map, potentials, annual_rates, sort=True):
+def calc_eligible_indices_generic(built_up_map, potentials, annual_rates, sort=True, zone_mask=None):
     """
     Build eligible donor indices per transition (i→j).
 
@@ -98,6 +98,7 @@ def calc_eligible_indices_generic(built_up_map, potentials, annual_rates, sort=T
         potentials   : Dict[(i:int, j:int)] -> 2D float array (transition potential for i→j)
         annual_rates : Dict[(i:int, j:int)] -> float (cells/year); pairs <=0 are ignored
         sort         : If True, return indices sorted by descending potential
+        zone_mask    : Optional 2D bool array; only cells where it is True can be donors
 
     Returns:
         elig : Dict[(i:int, j:int)] -> 1D np.ndarray of flat indices (eligible donors)
@@ -120,6 +121,8 @@ def calc_eligible_indices_generic(built_up_map, potentials, annual_rates, sort=T
         p = np.asarray(pot, dtype=np.float32)
         # donors: currently class i, valid cell, finite potential, positive potential
         donor_mask = (valid & (a_int == i) & np.isfinite(p) & (p > 0))
+        if zone_mask is not None:
+            donor_mask &= zone_mask
         if not donor_mask.any():
             continue
 

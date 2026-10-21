@@ -8,7 +8,8 @@ def update_built_up_map(
     annual_rates,
     rng=None, 
     randomness="gumbel", 
-    tau=0.1
+    tau=0.1,
+    water_zone=None
 ):
     """
     Simulate one year of change and return the updated map.
@@ -22,6 +23,7 @@ def update_built_up_map(
           - "gumbel": scores = pot + tau * Gumbel(0,1)
           - "jitter": scores = pot + Normal(0, tau * max(pot))
         tau: noise scale; try 0.05–0.2 for your potential range.
+        water_zone: optional 2D array; cells equal to 1 are never changed
 
     Returns:
         A copy of built_up_map with the allocated cells changed to their new class
@@ -48,7 +50,8 @@ def update_built_up_map(
             noisy[key] = pot  # deterministic
 
     # 3) eligible donors sorted by descending *noisy* score
-    elig = core_functions.calc_eligible_indices_generic(new_map, noisy, annual_rates, sort=True)
+    allowed = None if water_zone is None else (water_zone != 1)
+    elig = core_functions.calc_eligible_indices_generic(new_map, noisy, annual_rates, sort=True, zone_mask=allowed)
 
     # 4) allocate
     H, W = new_map.shape
@@ -82,7 +85,8 @@ def simulate_growth_based_scenario(
     output_folder,
     randomness,
     seed=2118,
-    tau=0.1
+    tau=0.1,
+    water_zone=None
 ): 
     """
     Growth-based scenario: the same annual demand for every transition, every year.
@@ -96,6 +100,7 @@ def simulate_growth_based_scenario(
         randomness: "none" | "gumbel" | "jitter", see update_built_up_map
         seed: seed of the random generator, which is created once for the whole run
         tau: noise scale, see update_built_up_map
+        water_zone: optional 2D array; cells equal to 1 are never changed
 
     Returns:
         simulated_maps: Dict[year] -> 2D array
@@ -125,7 +130,7 @@ def simulate_growth_based_scenario(
 
         # Run simulation, save map, and overwrite previous year map
         updated_map = update_built_up_map(current_built_up_map, prob_maps_dict, annual_rates,
-                                  rng=rng, randomness=randomness, tau=tau)
+                                  rng=rng, randomness=randomness, tau=tau, water_zone=water_zone)
         
         simulated_maps[current_year + 1] = updated_map
         current_built_up_map = updated_map
@@ -164,7 +169,8 @@ def simulate_density_based_scenario(
     output_folder,
     randomness='gumbel',
     seed=2118,
-    tau=0.1
+    tau=0.1,
+    water_zone=None
 ): 
     """
     Density-based scenario: the demand changes every year by a fixed amount, which follows
@@ -180,6 +186,7 @@ def simulate_density_based_scenario(
         randomness: "none" | "gumbel" | "jitter", see update_built_up_map
         seed: seed of the random generator, which is created once for the whole run
         tau: noise scale, see update_built_up_map
+        water_zone: optional 2D array; cells equal to 1 are never changed
 
     Returns:
         simulated_maps: Dict[year] -> 2D array
@@ -238,7 +245,8 @@ def simulate_density_based_scenario(
             use_rates,
             rng=rng,
             randomness=randomness,
-            tau=tau
+            tau=tau,
+            water_zone=water_zone
         )
         
         simulated_maps[current_year + 1] = updated_map
@@ -280,7 +288,8 @@ def simulate_densification_only_scenario(
     output_folder,
     randomness='gumbel',
     seed=2118,
-    tau=0.1
+    tau=0.1,
+    water_zone=None
 ):
     """
     Densification-only scenario: the demand for expansion (from class 0) falls linearly to zero
@@ -296,6 +305,7 @@ def simulate_densification_only_scenario(
         randomness: "none" | "gumbel" | "jitter", see update_built_up_map
         seed: seed of the random generator, which is created once for the whole run
         tau: noise scale, see update_built_up_map
+        water_zone: optional 2D array; cells equal to 1 are never changed
 
     Returns:
         simulated_maps: Dict[year] -> 2D array
@@ -348,7 +358,7 @@ def simulate_densification_only_scenario(
 
         # Run simulation, save map, and overwrite previous year map
         updated_map = update_built_up_map(current_built_up_map, prob_maps_dict, current_rates,
-                                  rng=rng, randomness=randomness, tau=tau)
+                                  rng=rng, randomness=randomness, tau=tau, water_zone=water_zone)
 
         simulated_maps[current_year + 1] = updated_map
         current_built_up_map = updated_map
