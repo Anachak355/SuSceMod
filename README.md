@@ -36,6 +36,8 @@ The growth-based scenario takes the same arguments. The density-based scenario a
 ## Input data
 - **Built-up maps:** single-band rasters on the same grid. Cells hold a density class: 0 for empty and 1, 2, 3 for increasing built-up density. Cells outside the study area are NaN.
 - **Suitability maps:** one raster per transition, named like `suitability_ref0_to_1.tif` (from class 0 to class 1). Each is divided by its own maximum, so values end up between 0 and 1. For the example, the transitions are 0→1, 0→2, 0→3, 1→2, 1→3 and 2→3.
+- **Water mask (optional):** a raster on the same grid where cells equal to 1 are never changed. Pass it as `water_zone` to any scenario.
+- **Centralities raster (centralities scenario):** a raster on the same grid, 1 inside the centralities and 0 outside.
 - **Demand:** the number of cells that change per year for each transition. You can calculate it from two or three historical built-up maps with `input_handling`, or pass your own values as a dictionary such as `{(0, 1): 490.6, (1, 2): 561.3}`.
 
 ## Results of the examples
@@ -52,9 +54,10 @@ The figures are made by `docs/make_figures.py` from the saved results in `SuSceM
 ## Folders
 ### 📂 `simulation/`
 This is the main engine for the simulation. It has tools to load rasters, simulate scenarios and save outputs. Three scenarios are available in `scenarios.py`:
-- `simulate_growth_based_scenario`: keeps the historical annual demand for every transition constant
-- `simulate_density_based_scenario`: changes the demand every year, following the trend between two historical periods
+- `simulate_growth_based_scenario` (Growth-As-Usual, GAU): keeps the historical annual demand for every transition constant
+- `simulate_density_based_scenario` (Business-As-Usual, BAU): changes the demand every year, following the trend between two historical periods
 - `simulate_densification_only_scenario`: reduces the demand for expansion (class 0 to 1, 2 and 3) linearly to zero by the final year. The cells this frees up are added to the densification demand (1 to 2, 1 to 3 and 2 to 3)
+- `simulate_centralities_scenario`: keeps the demand constant, but allocates a growing share of it inside the centralities. The share moves in equal yearly steps from its starting value to a target, 75% by default, so the demand is the same and only its location changes. Measure the starting share from two maps with `input_handling.calculate_central_shares`
 
 The strength of the random noise is set with `tau` (default 0.1) and the noise type with `randomness`.
 
