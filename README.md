@@ -51,6 +51,13 @@ Change in the number of cells per density class:
 
 The figures are made by `docs/make_figures.py` from the saved results in `SuSceMod/examples/output/`.
 
+## Tests
+```
+pip install -e ".[test]"
+pytest
+```
+`tests/test_scenarios.py` runs in a few seconds on small synthetic maps. `tests/test_examples.py` takes about a minute and checks that the three example scenarios reproduce the results saved in `SuSceMod/examples/output/`.
+
 ## Folders
 ### 📂 `simulation/`
 This is the main engine for the simulation. It has tools to load rasters, simulate scenarios and save outputs. Three scenarios are available in `scenarios.py`:
@@ -65,4 +72,4 @@ The strength of the random noise is set with `tau` (default 0.1) and the noise t
 This folder contains Python scripts focused on analysis, visualization and accuracy assessment of simulated urban built-up data.
 
 ### 📂 `examples/`
-Examples for modelling growth-based, density-based and densification-only scenarios, using jupyter notebooks and example rasters. The results of running each notebook are saved in `examples/output/`, in one subfolder per scenario, to compare against your own runs.
+Examples for modelling growth-based, density-based, densification-only and centralities scenarios, using jupyter notebooks and example rasters. The results of running the growth-based, density-based and densification-only notebooks are saved in `examples/output/`, in one subfolder per scenario, to compare against your own runs. The centralities notebook needs two more rasters in `input_rasters`, `BU_centralities.tif` and `ex_Zone_eau_binary.tif`, which are not included.
