@@ -71,7 +71,8 @@ def simulate_growth_based_scenario(
     annual_rates,
     output_folder,
     randomness,
-    seed=2118
+    seed=2118,
+    tau=0.1
 ): 
     simulated_maps, output_paths, class_counts = {}, {}, {}
     
@@ -96,7 +97,7 @@ def simulate_growth_based_scenario(
 
         # Run simulation, save map, and overwrite previous year map
         updated_map = update_built_up_map(current_built_up_map, prob_maps_dict, annual_rates,
-                                  rng=rng, randomness=randomness, tau=0.1)
+                                  rng=rng, randomness=randomness, tau=tau)
         
         simulated_maps[current_year + 1] = updated_map
         current_built_up_map = updated_map
@@ -134,7 +135,8 @@ def simulate_density_based_scenario(
     differential_change_rates,
     output_folder,
     randomness='gumbel',
-    seed=2118
+    seed=2118,
+    tau=0.1
 ): 
     simulated_maps, output_paths, class_counts = {}, {}, {}
     current_built_up_map = initial_built_up_map.copy()
@@ -188,7 +190,7 @@ def simulate_density_based_scenario(
             use_rates,
             rng=rng,
             randomness=randomness,
-            tau=0.1
+            tau=tau
         )
         
         simulated_maps[current_year + 1] = updated_map
@@ -229,7 +231,8 @@ def simulate_densification_only_scenario(
     annual_rates,
     output_folder,
     randomness='gumbel',
-    seed=2118
+    seed=2118,
+    tau=0.1
 ):
     simulated_maps, output_paths, class_counts = {}, {}, {}
 
@@ -277,7 +280,7 @@ def simulate_densification_only_scenario(
 
         # Run simulation, save map, and overwrite previous year map
         updated_map = update_built_up_map(current_built_up_map, prob_maps_dict, current_rates,
-                                  rng=rng, randomness=randomness, tau=0.1)
+                                  rng=rng, randomness=randomness, tau=tau)
 
         simulated_maps[current_year + 1] = updated_map
         current_built_up_map = updated_map
