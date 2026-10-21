@@ -79,7 +79,7 @@ def simulate_growth_based_scenario(
     
     print("\nDemands (cells/year):")
     for (i, j), rate in sorted(annual_rates.items()):
-        print(f"    -> {i} → {j}: {rate}")
+        print(f"    {i} -> {j}: {rate}")
 
     rng = np.random.default_rng(seed)
 
@@ -157,14 +157,14 @@ def simulate_density_based_scenario(
         return nxt
 
     # Print the baseline and the first changed rates
-    print("\nDemands (cells/year) — Year 1 (baseline):")
+    print("\nDemands (cells/year) - Year 1 (baseline):")
     for (i, j), rate in sorted(current_rates.items()):
-        print(f"    -> {i} → {j}: {rate}")
+        print(f"    {i} -> {j}: {rate}")
 
     preview_year2 = step_rates(current_rates, delta_rates)
-    print("\nDemands (cells/year) — Year 2 (after 1 year of change, clamped ≥ 0):")
+    print("\nDemands (cells/year) - Year 2 (after 1 year of change, clamped to >= 0):")
     for (i, j), rate in sorted(preview_year2.items()):
-        print(f"    -> {i} → {j}: {rate}")
+        print(f"    {i} -> {j}: {rate}")
 
     rng = np.random.default_rng(seed)
 
@@ -244,10 +244,10 @@ def simulate_densification_only_scenario(
 
     print("\nDemands (cells/year):")
     for (i, j), rate in sorted(annual_rates.items()):
-        print(f"    -> {i} → {j}: {rate}")
+        print(f"    {i} -> {j}: {rate}")
     print("\nYearly decrease in expansion demand (cells/year):")
     for (i, j), rate in sorted(decrease_rates.items()):
-        print(f"    -> {i} → {j}: {rate}")
+        print(f"    {i} -> {j}: {rate}")
 
     rng = np.random.default_rng(seed)
 
@@ -273,7 +273,7 @@ def simulate_densification_only_scenario(
 
         print("\nCurrent demands (cells/year):")
         for (i, j), rate in sorted(current_rates.items()):
-            print(f"    -> {i} → {j}: {rate}")
+            print(f"    {i} -> {j}: {rate}")
 
         # Run simulation, save map, and overwrite previous year map
         updated_map = update_built_up_map(current_built_up_map, prob_maps_dict, current_rates,

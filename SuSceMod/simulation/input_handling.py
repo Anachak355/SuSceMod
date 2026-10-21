@@ -73,7 +73,7 @@ def load_prob_maps(
             key = (from_id, to_id)
             if key in maps_by_transition:
                 print(
-                    f"[load_prob_maps] Duplicate transition {key} — "
+                    f"[load_prob_maps] Duplicate transition {key} - "
                     f"replacing {paths_by_transition[key]} with {fpath}"
                 )
 
@@ -185,7 +185,7 @@ def calculate_change_rates(change_maps_dict, change_years, print_summary=True):
         print(crosstab_df)
         print("\nAnnual change rates (cells/year):")
         for (i, j), rate in sorted(annual_change_rates.items()):
-            print(f"    -> {i} → {j}: {rate}")
+            print(f"    {i} -> {j}: {rate}")
 
     return annual_change_rates, period_counts, crosstab_df
 
@@ -212,16 +212,16 @@ def calculate_change_rates_historical(change_maps_dict_1, change_maps_dict_2, ch
             change_rates[k] = dec
 
     if print_summary:
-        print(f"\nDict_2 crosstab (counts incl. diagonal) for {split}–{end2}:")
+        print(f"\nDict_2 crosstab (counts incl. diagonal) for {split}-{end2}:")
         print(crosstab_df_2)
         print("\nDict_2 annual change rates (cells/year):")
         for (i, j), rate in sorted(annual_rates_2.items()):
-            print(f"    -> {i} → {j}: {rate}")
+            print(f"    {i} -> {j}: {rate}")
         if change_rates:
-            print(f"\nChanges vs. dict_1 [{start1}–{split}] (cells/year):")
+            print(f"\nChanges vs. dict_1 [{start1}-{split}] (cells/year):")
             for (i, j), dec in sorted(change_rates.items()):
-                print(f"    ↓ {i} → {j}: {dec}")
+                print(f"    down {i} -> {j}: {dec}")
         else:
-            print(f"\nNo Changes vs. dict_1 [{start1}–{split}].")
+            print(f"\nNo Changes vs. dict_1 [{start1}-{split}].")
 
     return annual_rates_2, change_rates, period_counts_2, crosstab_df_2
