@@ -38,6 +38,10 @@ def update_built_up_map(
     if rng is None:
         rng = np.random.default_rng(42)
 
+    for name, zone in (("water_zone", water_zone), ("central_zones", central_zones)):
+        if zone is not None and zone.shape != built_up_map.shape:
+            raise ValueError(f"{name} has shape {zone.shape} but the built-up map has shape {built_up_map.shape}")
+
     new_map = built_up_map.copy()
     # 1) base potentials
     potentials = core_functions.calc_transition_potentials(new_map, prob_maps_dict)
@@ -58,36 +62,34 @@ def update_built_up_map(
     # 3) where each demand is allocated: everywhere, or inside and outside the centralities
     allowed = np.ones(new_map.shape, dtype=bool) if water_zone is None else (water_zone != 1)
     if central_zones is None:
-        zones = [(annual_rates, allowed)]
+        zones = [(annual_rates, allowed, "")]
     else:
         if annual_rates_outside is None:
             raise ValueError("annual_rates_outside is needed when central_zones is given")
-        zones = [(annual_rates, allowed & (central_zones == 1)),
-                 (annual_rates_outside, allowed & (central_zones == 0))]
+        zones = [(annual_rates, allowed & (central_zones == 1), " inside the centralities"),
+                 (annual_rates_outside, allowed & (central_zones == 0), " outside the centralities")]
 
     # 4) eligible donors sorted by descending *noisy* score
     elig_per_zone = [
         core_functions.calc_eligible_indices_generic(new_map, noisy, rates, sort=True, zone_mask=mask)
-        for rates, mask in zones
+        for rates, mask, _ in zones
     ]
 
     # 5) allocate
     H, W = new_map.shape
     assigned = np.zeros((H, W), dtype=bool)
 
-    for (rates, _), elig in zip(zones, elig_per_zone):
+    for (rates, _, where), elig in zip(zones, elig_per_zone):
         items = [((int(i), int(j)), max(0, int(round(v)))) for (i, j), v in rates.items() if v > 0]
         items.sort(key=lambda kv: kv[1], reverse=True)
 
         for (i, j), need in items:
             cand = elig.get((i, j))
-            if cand is None or need <= 0:
-                continue
-            remaining = ~assigned.ravel()[cand]
-            if not remaining.any():
-                continue
-            cand = cand[remaining]
-            take = min(need, cand.size)
+            if cand is not None:
+                cand = cand[~assigned.ravel()[cand]]
+            take = min(need, 0 if cand is None else cand.size)
+            if take < need:
+                print(f"    Only {take} of {need} cells could be allocated for {i} -> {j}{where}")
             if take <= 0:
                 continue
             chosen = cand[:take]  # already ranked by noisy score
@@ -451,6 +453,9 @@ def simulate_centralities_scenario(
         output_paths: Dict[year] -> path to save that year's map to
         class_counts: Dict[year] -> [classes, cell counts]
     """
+    if not (np.any(central_zones == 1) and np.any(central_zones == 0)):
+        raise ValueError("central_zones must have cells equal to 1 (inside) and cells equal to 0 (outside)")
+
     simulated_maps, output_paths, class_counts = {}, {}, {}
 
     current_built_up_map = initial_built_up_map.copy()
