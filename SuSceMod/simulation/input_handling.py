@@ -244,3 +244,28 @@ def calculate_change_rates_historical(change_maps_dict_1, change_maps_dict_2, ch
             print(f"\nNo Changes vs. dict_1 [{start1}-{split}].")
 
     return annual_rates_2, change_rates, period_counts_2, crosstab_df_2
+
+def calculate_central_shares(start_map, end_map, central_zones, decimals=2):
+    """
+    Share of the expansion and of the densification between two maps that happened inside the centralities.
+    Expansion is a cell going from class 0 to a built-up class, densification is a built-up cell going to a higher class.
+
+    Args:
+        start_map, end_map: 2D float arrays of density classes, NaN outside the study area
+        central_zones: 2D array, 1 inside the centralities and 0 outside
+        decimals: the shares are rounded to this many decimals
+
+    Returns:
+        [expansion share, densification share], each between 0 and 1
+    """
+    with np.errstate(invalid="ignore"):
+        valid = ~np.isnan(start_map) & ~np.isnan(end_map)
+        expansion = valid & (start_map == 0) & (end_map > 0)
+        densification = valid & (start_map >= 1) & (end_map > start_map)
+        inside = central_zones == 1
+
+    shares = []
+    for changed in (expansion, densification):
+        total = int(changed.sum())
+        shares.append(round(int((changed & inside).sum()) / total, decimals) if total else 0.0)
+    return shares

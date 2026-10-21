@@ -9,7 +9,9 @@ def update_built_up_map(
     rng=None, 
     randomness="gumbel", 
     tau=0.1,
-    water_zone=None
+    water_zone=None,
+    central_zones=None,
+    annual_rates_outside=None
 ):
     """
     Simulate one year of change and return the updated map.
@@ -24,6 +26,10 @@ def update_built_up_map(
           - "jitter": scores = pot + Normal(0, tau * max(pot))
         tau: noise scale; try 0.05–0.2 for your potential range.
         water_zone: optional 2D array; cells equal to 1 are never changed
+        central_zones: optional 2D array, 1 inside the centralities and 0 outside. If given,
+            annual_rates is the demand inside the centralities and annual_rates_outside the demand outside
+        annual_rates_outside: Dict[(from, to)] -> demand in cells outside the centralities;
+            needed when central_zones is given
 
     Returns:
         A copy of built_up_map with the allocated cells changed to their new class
@@ -49,30 +55,44 @@ def update_built_up_map(
         else:
             noisy[key] = pot  # deterministic
 
-    # 3) eligible donors sorted by descending *noisy* score
-    allowed = None if water_zone is None else (water_zone != 1)
-    elig = core_functions.calc_eligible_indices_generic(new_map, noisy, annual_rates, sort=True, zone_mask=allowed)
+    # 3) where each demand is allocated: everywhere, or inside and outside the centralities
+    allowed = np.ones(new_map.shape, dtype=bool) if water_zone is None else (water_zone != 1)
+    if central_zones is None:
+        zones = [(annual_rates, allowed)]
+    else:
+        if annual_rates_outside is None:
+            raise ValueError("annual_rates_outside is needed when central_zones is given")
+        zones = [(annual_rates, allowed & (central_zones == 1)),
+                 (annual_rates_outside, allowed & (central_zones == 0))]
 
-    # 4) allocate
+    # 4) eligible donors sorted by descending *noisy* score
+    elig_per_zone = [
+        core_functions.calc_eligible_indices_generic(new_map, noisy, rates, sort=True, zone_mask=mask)
+        for rates, mask in zones
+    ]
+
+    # 5) allocate
     H, W = new_map.shape
     assigned = np.zeros((H, W), dtype=bool)
-    items = [((int(i), int(j)), max(0, int(round(v)))) for (i, j), v in annual_rates.items() if v > 0]
-    items.sort(key=lambda kv: kv[1], reverse=True)
 
-    for (i, j), need in items:
-        cand = elig.get((i, j))
-        if cand is None or need <= 0:
-            continue
-        remaining = ~assigned.ravel()[cand]
-        if not remaining.any():
-            continue
-        cand = cand[remaining]
-        take = min(need, cand.size)
-        if take <= 0:
-            continue
-        chosen = cand[:take]  # already ranked by noisy score
-        new_map.flat[chosen] = float(j)
-        assigned.flat[chosen] = True
+    for (rates, _), elig in zip(zones, elig_per_zone):
+        items = [((int(i), int(j)), max(0, int(round(v)))) for (i, j), v in rates.items() if v > 0]
+        items.sort(key=lambda kv: kv[1], reverse=True)
+
+        for (i, j), need in items:
+            cand = elig.get((i, j))
+            if cand is None or need <= 0:
+                continue
+            remaining = ~assigned.ravel()[cand]
+            if not remaining.any():
+                continue
+            cand = cand[remaining]
+            take = min(need, cand.size)
+            if take <= 0:
+                continue
+            chosen = cand[:take]  # already ranked by noisy score
+            new_map.flat[chosen] = float(j)
+            assigned.flat[chosen] = True
 
     return new_map
 
@@ -359,6 +379,119 @@ def simulate_densification_only_scenario(
         # Run simulation, save map, and overwrite previous year map
         updated_map = update_built_up_map(current_built_up_map, prob_maps_dict, current_rates,
                                   rng=rng, randomness=randomness, tau=tau, water_zone=water_zone)
+
+        simulated_maps[current_year + 1] = updated_map
+        current_built_up_map = updated_map
+
+        # Set output paths
+        output_paths[current_year + 1] = os.path.join(output_folder, f"sim_{current_year + 1}.tif")
+
+        # Debugging: Print summary of the updated map
+        unique, counts = np.unique(current_built_up_map, return_counts=True)
+        unique = [float(x) if not np.isnan(x) else 'nan' for x in unique]
+        counts = [int(x) for x in counts]
+        print('\n------------------------------------------------------')
+        print(f"\nYear {current_year + 1}: Updated built-up map summary (value: count):")
+        print(dict(zip(unique, counts)))
+        if year > 0:
+            unique_old = [float(x) if not np.isnan(x) else 'nan' for x in unique_old]
+            curr = {int(k): int(v) for k, v in zip(unique, counts) if k != 'nan'}
+            prev = {int(k): int(v) for k, v in zip(unique_old, counts_old) if k != 'nan'}
+            all_classes = sorted(set(curr) | set(prev))
+            counts_diff = {c: curr.get(c, 0) - prev.get(c, 0) for c in all_classes}
+            print("\nChanges from previous year summary (value: count):")
+            print(counts_diff)
+
+        # Saving values to a dictionary to save to file
+        class_counts[current_year + 1] = [unique, counts]
+
+    return simulated_maps, output_paths, class_counts
+
+def simulate_centralities_scenario(
+    initial_year,
+    final_year,
+    initial_built_up_map,
+    prob_maps_dict,
+    annual_rates,
+    central_zones,
+    initial_central_shares,
+    output_folder,
+    final_central_shares=(0.75, 0.75),
+    water_zone=None,
+    randomness='gumbel',
+    seed=2118,
+    tau=0.1
+):
+    """
+    Centralities scenario: the total demand is the same every year, but a growing share of it is
+    allocated inside the centralities. The share moves in equal yearly steps from its initial value
+    to its final value.
+
+    Args:
+        initial_year, final_year: simulates the years initial_year + 1 to final_year
+        initial_built_up_map: 2D float array of density classes, NaN outside the study area
+        prob_maps_dict: Dict[(from, to)] -> 2D suitability array, normalised to [0, 1]
+        annual_rates: Dict[(from, to)] -> total demand in cells per year, the same every year
+        central_zones: 2D array, 1 inside the centralities and 0 outside
+        initial_central_shares: [expansion, densification] share of the demand inside the centralities
+            in initial_year, for example from input_handling.calculate_central_shares
+        output_folder: folder the simulated maps are meant to be saved in; used to build output_paths
+        final_central_shares: [expansion, densification] share inside the centralities in final_year
+        water_zone: optional 2D array; cells equal to 1 are never changed
+        randomness: "none" | "gumbel" | "jitter", see update_built_up_map
+        seed: seed of the random generator, which is created once for the whole run
+        tau: noise scale, see update_built_up_map
+
+    Expansion is any transition from class 0, and densification any other transition. Each year the
+    demand of a transition is split into whole cells inside and outside the centralities, and the two
+    parts always add up to the total.
+
+    Returns:
+        simulated_maps: Dict[year] -> 2D array
+        output_paths: Dict[year] -> path to save that year's map to
+        class_counts: Dict[year] -> [classes, cell counts]
+    """
+    simulated_maps, output_paths, class_counts = {}, {}, {}
+
+    current_built_up_map = initial_built_up_map.copy()
+
+    # Share of the demand inside the centralities for every year, in equal yearly steps
+    central_shares = core_functions.calculate_central_percentages(
+        initial_year, final_year, initial_central_shares, final_central_shares
+    )
+
+    print("\nDemands (cells/year):")
+    for (i, j), rate in sorted(annual_rates.items()):
+        print(f"    {i} -> {j}: {rate}")
+    print(f"\nShare inside the centralities (expansion, densification): "
+          f"{list(initial_central_shares)} in {initial_year}, {list(final_central_shares)} in {final_year}")
+
+    rng = np.random.default_rng(seed)
+
+    for year in range(final_year - initial_year):
+        # Remember previous simulation values to compare with new
+        unique_old, counts_old = np.unique(current_built_up_map, return_counts=True)
+
+        # Calculate the current year
+        current_year = initial_year + year
+
+        print("\n###################################################################\n")
+        print(f"Current year: {current_year}")
+        print(f"Simulating for year: {current_year + 1}")
+
+        # Split the demand into the part inside and the part outside the centralities
+        shares = central_shares[current_year + 1]
+        rates_inside, rates_outside = core_functions.split_demand_by_zone(annual_rates, shares)
+
+        print(f"\nShare inside the centralities: expansion {shares[0]}, densification {shares[1]}")
+        print("Demands inside / outside the centralities (cells/year):")
+        for (i, j) in sorted(rates_inside):
+            print(f"    {i} -> {j}: {rates_inside[(i, j)]} / {rates_outside[(i, j)]}")
+
+        # Run simulation, save map, and overwrite previous year map
+        updated_map = update_built_up_map(current_built_up_map, prob_maps_dict, rates_inside,
+                                  rng=rng, randomness=randomness, tau=tau, water_zone=water_zone,
+                                  central_zones=central_zones, annual_rates_outside=rates_outside)
 
         simulated_maps[current_year + 1] = updated_map
         current_built_up_map = updated_map

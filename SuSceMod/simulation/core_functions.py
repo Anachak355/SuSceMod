@@ -139,6 +139,28 @@ def calc_eligible_indices_generic(built_up_map, potentials, annual_rates, sort=T
 
 
 
+def split_demand_by_zone(annual_rates, shares):
+    """
+    Split the demand of every transition into a part inside and a part outside the centralities.
+
+    Args:
+        annual_rates: Dict[(from, to)] -> demand in cells for the year
+        shares: [share of expansion inside, share of densification inside]; expansion is any
+                transition from class 0, densification is any other transition
+
+    Returns:
+        inside, outside: two Dict[(from, to)] -> whole cells. For every transition they add up
+        to the rounded demand; if rounding loses a cell, it goes to the inside part.
+    """
+    inside, outside = {}, {}
+    for (i, j), rate in annual_rates.items():
+        share = shares[0] if int(i) == 0 else shares[1]
+        total = max(0, int(round(rate)))
+        out = int(np.floor(round(total * (1 - share), 2)))
+        inside[(i, j)] = float(total - out)
+        outside[(i, j)] = float(out)
+    return inside, outside
+
 def calc_eligible_indices_fast(built_up_map, trans_pot_arrays, water_zone=None, central_zones=None, allocate_central=False, sorting=False):
     # Set defaults for optional arguments
     if water_zone is None:
