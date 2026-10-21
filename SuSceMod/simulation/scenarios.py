@@ -11,10 +11,20 @@ def update_built_up_map(
     tau=0.1
 ):
     """
-    randomness: "none" | "gumbel" | "jitter"
-      - "gumbel": scores = pot + tau * Gumbel(0,1)
-      - "jitter": scores = pot + Normal(0, tau * max(pot))
-    tau: noise scale; try 0.05–0.2 for your potential range.
+    Simulate one year of change and return the updated map.
+
+    Args:
+        built_up_map: 2D float array of density classes, NaN outside the study area
+        prob_maps_dict: Dict[(from, to)] -> 2D suitability array, normalised to [0, 1]
+        annual_rates: Dict[(from, to)] -> demand in cells for this year
+        rng: numpy random generator; created with seed 42 if not given
+        randomness: "none" | "gumbel" | "jitter"
+          - "gumbel": scores = pot + tau * Gumbel(0,1)
+          - "jitter": scores = pot + Normal(0, tau * max(pot))
+        tau: noise scale; try 0.05–0.2 for your potential range.
+
+    Returns:
+        A copy of built_up_map with the allocated cells changed to their new class
     """
 
     if rng is None:
@@ -74,6 +84,24 @@ def simulate_growth_based_scenario(
     seed=2118,
     tau=0.1
 ): 
+    """
+    Growth-based scenario: the same annual demand for every transition, every year.
+
+    Args:
+        initial_year, final_year: simulates the years initial_year + 1 to final_year
+        initial_built_up_map: 2D float array of density classes, NaN outside the study area
+        prob_maps_dict: Dict[(from, to)] -> 2D suitability array, normalised to [0, 1]
+        annual_rates: Dict[(from, to)] -> demand in cells per year
+        output_folder: folder the simulated maps are meant to be saved in; used to build output_paths
+        randomness: "none" | "gumbel" | "jitter", see update_built_up_map
+        seed: seed of the random generator, which is created once for the whole run
+        tau: noise scale, see update_built_up_map
+
+    Returns:
+        simulated_maps: Dict[year] -> 2D array
+        output_paths: Dict[year] -> path to save that year's map to
+        class_counts: Dict[year] -> [classes, cell counts]
+    """
     simulated_maps, output_paths, class_counts = {}, {}, {}
     
     current_built_up_map = initial_built_up_map.copy()
@@ -138,6 +166,26 @@ def simulate_density_based_scenario(
     seed=2118,
     tau=0.1
 ): 
+    """
+    Density-based scenario: the demand changes every year by a fixed amount, which follows
+    the trend between two historical periods. Demand never goes below zero.
+
+    Args:
+        initial_year, final_year: simulates the years initial_year + 1 to final_year
+        initial_built_up_map: 2D float array of density classes, NaN outside the study area
+        prob_maps_dict: Dict[(from, to)] -> 2D suitability array, normalised to [0, 1]
+        annual_rates: Dict[(from, to)] -> demand in cells per year
+        differential_change_rates: Dict[(from, to)] -> change in demand per year, can be negative
+        output_folder: folder the simulated maps are meant to be saved in; used to build output_paths
+        randomness: "none" | "gumbel" | "jitter", see update_built_up_map
+        seed: seed of the random generator, which is created once for the whole run
+        tau: noise scale, see update_built_up_map
+
+    Returns:
+        simulated_maps: Dict[year] -> 2D array
+        output_paths: Dict[year] -> path to save that year's map to
+        class_counts: Dict[year] -> [classes, cell counts]
+    """
     simulated_maps, output_paths, class_counts = {}, {}, {}
     current_built_up_map = initial_built_up_map.copy()
 
@@ -234,6 +282,26 @@ def simulate_densification_only_scenario(
     seed=2118,
     tau=0.1
 ):
+    """
+    Densification-only scenario: the demand for expansion (from class 0) falls linearly to zero
+    by final_year. The cells this frees up are added to the densification demand, paired in
+    sorted order: 0->1 with 1->2, 0->2 with 1->3 and 0->3 with 2->3.
+
+    Args:
+        initial_year, final_year: simulates the years initial_year + 1 to final_year
+        initial_built_up_map: 2D float array of density classes, NaN outside the study area
+        prob_maps_dict: Dict[(from, to)] -> 2D suitability array, normalised to [0, 1]
+        annual_rates: Dict[(from, to)] -> demand in cells per year
+        output_folder: folder the simulated maps are meant to be saved in; used to build output_paths
+        randomness: "none" | "gumbel" | "jitter", see update_built_up_map
+        seed: seed of the random generator, which is created once for the whole run
+        tau: noise scale, see update_built_up_map
+
+    Returns:
+        simulated_maps: Dict[year] -> 2D array
+        output_paths: Dict[year] -> path to save that year's map to
+        class_counts: Dict[year] -> [classes, cell counts]
+    """
     simulated_maps, output_paths, class_counts = {}, {}, {}
 
     current_built_up_map = initial_built_up_map.copy()

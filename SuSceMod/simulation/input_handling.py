@@ -11,6 +11,10 @@ _SUITABILITY_REGEX = re.compile(
 _DEFAULT_EXTS = (".tif", ".tiff", ".img", ".vrt", ".asc")
 
 def normalize_probabilities(prob_maps, clip=True, eps=1e-9):
+    """
+    Divide each map by its own maximum, so values lie between 0 and 1.
+    A map that is all NaN, or whose maximum is not above eps, becomes zeros (NaN cells stay NaN).
+    """
     out = {}
     for key, arr in prob_maps.items():
         a = np.array(arr, dtype=np.float32, copy=False)
@@ -190,6 +194,21 @@ def calculate_change_rates(change_maps_dict, change_years, print_summary=True):
     return annual_change_rates, period_counts, crosstab_df
 
 def calculate_change_rates_historical(change_maps_dict_1, change_maps_dict_2, change_years, print_summary=True):
+    """
+    Annual demand of the second period, and how it changed compared with the first.
+
+    Args:
+        change_maps_dict_1: change maps of the first period, from calculate_change_maps
+        change_maps_dict_2: change maps of the second period
+        change_years: [start of first period, year between the periods, end of second period]
+        print_summary: print the crosstab and the rates
+
+    Returns:
+        annual_rates_2: Dict[(from, to)] -> cells per year in the second period
+        change_rates: Dict[(from, to)] -> second rate minus first rate, only where it fell
+        period_counts_2: Dict[(from, to)] -> cells that changed in the second period
+        crosstab_df_2: crosstab of the second period
+    """
     if not isinstance(change_years, (list, tuple)) or len(change_years) != 3:
         raise ValueError("change_years must be [start1, split, end2].")
 

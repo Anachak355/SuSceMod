@@ -7,7 +7,7 @@ From the root of this repository:
 ```
 pip install -e .
 ```
-This installs `numpy`, `pandas`, `rasterio`, `matplotlib`, `seaborn`, `openpyxl`, `tabulate`, `scikit-learn` and `scikit-image`. It was tested with Python 3.13. To run the example notebooks you also need Jupyter.
+This installs `numpy`, `pandas`, `rasterio`, `matplotlib`, `seaborn`, `openpyxl`, `tabulate`, `scikit-learn` and `scikit-image`. It needs Python 3.10 or newer and was tested with Python 3.13. To run the example notebooks you also need Jupyter.
 
 ## Quick start
 This runs the densification-only scenario for 2020 to 2030, using the example rasters in `SuSceMod/examples/`:
@@ -55,6 +55,8 @@ This is the main engine for the simulation. It has tools to load rasters, simula
 - `simulate_growth_based_scenario`: keeps the historical annual demand for every transition constant
 - `simulate_density_based_scenario`: changes the demand every year, following the trend between two historical periods
 - `simulate_densification_only_scenario`: reduces the demand for expansion (class 0 to 1, 2 and 3) linearly to zero by the final year. The cells this frees up are added to the densification demand (1 to 2, 1 to 3 and 2 to 3)
+
+The strength of the random noise is set with `tau` (default 0.1) and the noise type with `randomness`.
 
 ### 📂 `analysis/`
 This folder contains Python scripts focused on analysis, visualization and accuracy assessment of simulated urban built-up data.

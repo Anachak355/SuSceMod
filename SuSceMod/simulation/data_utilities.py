@@ -6,12 +6,17 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap, BoundaryNorm
 
 def load_raster_data(raster_path):
+    """Read band 1 as a float32 array, with NaN where the raster has nodata."""
     with rasterio.open(raster_path) as src:
         arr = src.read(1, out_dtype="float32", masked=True)
         data = np.ma.filled(arr, np.nan)
     return data
 
 def writeraster(template_raster_path, output_raster_path, lu_org):
+    """
+    Save lu_org as a single-band float32 GeoTiff, with the extent, projection and cell size of the
+    template raster. NaN is the nodata value.
+    """
     
     with rasterio.open(template_raster_path) as template_raster:
         profile = template_raster.profile
@@ -22,6 +27,13 @@ def writeraster(template_raster_path, output_raster_path, lu_org):
         output_raster.write(lu_org.astype('float32'), 1)
     
 def save_counts_to_csv(class_counts, filename):  
+    """
+    Write the class counts of a simulation to a csv file, one row per class and one column per year.
+
+    Args:
+        class_counts: Dict[year] -> [classes, cell counts], as returned by the scenario functions
+        filename: path of the csv file
+    """
     counts = [class_counts[key][1] for key in class_counts.keys()]
     keys = list(class_counts.keys())
     result = [list(pair) for pair in zip(*counts)]
@@ -35,6 +47,10 @@ def save_counts_to_csv(class_counts, filename):
             writer.writerow(row)
 
 def counts_to_df(counts_dict, exclude_nan=True):
+    """
+    Convert the class counts of a simulation to a long dataframe with the columns year, category and count.
+    Cells with NaN as category are always left out; exclude_nan is currently not used.
+    """
     rows = []
     for year, (cats, counts) in counts_dict.items():
         for c, v in zip(cats, counts):
@@ -45,6 +61,7 @@ def counts_to_df(counts_dict, exclude_nan=True):
     return counts_df
             
 def compute_cross_tab(raster1_path, raster2_path, nodata_value):
+    """Cross-tabulate the classes of two rasters, ignoring cells that are nodata in either one."""
     with rasterio.open(raster1_path) as src1, rasterio.open(raster2_path) as src2:
         data1 = src1.read(1)
         data2 = src2.read(1)
