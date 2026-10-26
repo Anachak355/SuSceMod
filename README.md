@@ -49,7 +49,13 @@ Change in the number of cells per density class:
 
 ![Change in cell count per density class](docs/class_trends.png)
 
-The figures are made by `docs/make_figures.py` from the saved results in `SuSceMod/examples/output/`.
+Growth-As-Usual against Centralities, both from the same map of 2030, with the same demand and the same seed. Growth-As-Usual keeps the historical share inside the centralities, 13% of the expansion and 26% of the densification. The centralities scenario moves that share in equal yearly steps to 75% by 2050. Both change about 37,300 cells between 2030 and 2050, but with Growth-As-Usual 13% of the expansion and 26% of the densification are inside the centralities, and with Centralities 46% and 52%:
+
+![Cells that change between 2030 and 2050 under Growth-As-Usual and Centralities](docs/centralities_maps.png)
+
+![Share of each year's change inside the centralities](docs/centralities_shares.png)
+
+The figures are made by `docs/make_figures.py` from the saved results in `SuSceMod/examples/output/`. The two figures of the centralities scenario also need `BU_centralities.tif` and `ex_Zone_eau_binary.tif` in `input_rasters`.
 
 ## Tests
 ```
@@ -60,13 +66,22 @@ pytest
 
 ## Folders
 ### 📂 `simulation/`
-This is the main engine for the simulation. It has tools to load rasters, simulate scenarios and save outputs. Three scenarios are available in `scenarios.py`:
+This is the main engine for the simulation. It is split by what each part decides:
+
+- `scenarios.py`: the four scenarios you call. Each one fixes how much demand there is every year, then runs the same yearly loop.
+- `demand.py`: the demand rules (constant, trend, phased-out expansion), the yearly share inside the centralities, and the split of the demand into inside and outside.
+- `allocation.py`: how one year of change is placed on cells, with the water mask and the centralities as zones. It holds both ways of choosing the cells: ranking, which is the default, and the original acceptance rule.
+- `input_handling.py`, `data_utilities.py`, `logger.py`: loading the rasters and the demand, saving the outputs, and logging.
+
+The scenarios in `scenarios.py`:
 - `simulate_growth_based_scenario` (Growth-As-Usual, GAU): keeps the historical annual demand for every transition constant
 - `simulate_density_based_scenario` (Business-As-Usual, BAU): changes the demand every year, following the trend between two historical periods
-- `simulate_densification_only_scenario`: reduces the demand for expansion (class 0 to 1, 2 and 3) linearly to zero by the final year. The cells this frees up are added to the densification demand (1 to 2, 1 to 3 and 2 to 3)
-- `simulate_centralities_scenario`: keeps the demand constant, but allocates a growing share of it inside the centralities. The share moves in equal yearly steps from its starting value to a target, 75% by default, so the demand is the same and only its location changes. Measure the starting share from two maps with `input_handling.calculate_central_shares`
+- `simulate_densification_only_scenario` (Densification Only, DO): reduces the demand for expansion (class 0 to 1, 2 and 3) linearly to zero by the final year. The cells this frees up are added to the densification demand (1 to 2, 1 to 3 and 2 to 3)
+- `simulate_centralities_scenario`: keeps the demand constant, as in GAU, but allocates a growing share of it inside the centralities. The share moves in equal yearly steps from its starting value to a target, 75% by default. Measure the starting share from two maps with `input_handling.calculate_central_shares`
 
-The strength of the random noise is set with `tau` (default 0.1) and the noise type with `randomness`.
+**Forcing a share inside the centralities.** GAU, BAU and DO also take `central_zones` and `central_shares`, a pair `[expansion, densification]`. The demand is then split every year with that same share, which keeps the historical share as it is. For example, `simulate_growth_based_scenario(..., central_zones=zones, central_shares=[0.13, 0.26])` is GAU with the historical split. With DO, each zone's cancelled expansion turns into that zone's own densification.
+
+**Other options.** Every scenario also takes `water_zone` (cells equal to 1 never change). `randomness` chooses how the cells are chosen. `"gumbel"` (the default), `"jitter"` and `"none"` give each demand to the cells with the highest score, which is the transition potential plus noise, and `tau` (default 0.1) sets the size of the noise. `"acceptance"` is the original rule of the model: cells are visited in order of potential, and a cell is accepted if its potential is above a random number times a temperature that cools after every pass, until the demand is met. It uses no noise, so `tau` does not apply, and demands are rounded down.
 
 ### 📂 `analysis/`
 This folder contains Python scripts focused on analysis, visualization and accuracy assessment of simulated urban built-up data.
