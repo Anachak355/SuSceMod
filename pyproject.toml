@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "SuSceMod"
-version = "0.1.0"
+version = "4.0.0"
 description = "Package for scenario modelling for urban land use."
 requires-python = ">=3.10"
 readme = "README.md"
