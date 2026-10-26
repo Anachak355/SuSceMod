@@ -68,3 +68,29 @@ def test_densification_only_matches_saved_output(inputs):
     maps = quiet(scenarios.simulate_densification_only_scenario, 2020, 2030, initial, prob_maps, rates, "out",
                  randomness="gumbel", seed=2118)[0]
     assert_same_as_saved("densification_only", maps)
+
+
+def test_centralities_matches_saved_output(inputs):
+    """The same steps as the centralities notebook: measure the historical share inside the centralities, run GAU to 2030
+    with that share forced, then let the share move to 75% by 2050."""
+    zones_path = EXAMPLES / "input_rasters" / "BU_centralities.tif"
+    water_path = EXAMPLES / "input_rasters" / "ex_Zone_eau_binary.tif"
+    if not (zones_path.exists() and water_path.exists()):
+        pytest.skip("BU_centralities.tif and ex_Zone_eau_binary.tif are not in input_rasters")
+    initial, prob_maps, rates, _, _ = inputs
+    zones = data_utilities.load_raster_data(str(zones_path))
+    water = data_utilities.load_raster_data(str(water_path))
+    map_2010 = data_utilities.load_raster_data(str(EXAMPLES / "input_rasters" / "BU_2010.tif"))
+
+    historical = input_handling.calculate_central_shares(map_2010, initial, zones)
+    assert historical == [0.13, 0.26]  # the shares of chapter 7
+
+    gau = quiet(scenarios.simulate_growth_based_scenario, 2020, 2030, initial, prob_maps, rates, "out",
+                randomness="gumbel", seed=2118, water_zone=water, central_zones=zones, central_shares=historical)[0]
+    shares = input_handling.calculate_central_shares(initial, gau[2030], zones)
+    assert shares == [0.13, 0.26]  # forcing the share keeps it at 2030
+
+    maps = quiet(scenarios.simulate_centralities_scenario, 2030, 2050, gau[2030], prob_maps, rates, zones, shares, "out",
+                 final_central_shares=[0.75, 0.75], water_zone=water, randomness="gumbel", seed=2118)[0]
+    for year in range(2031, 2051):
+        assert np.array_equal(maps[year], saved("centralities", year), equal_nan=True), f"centralities differs in {year}"

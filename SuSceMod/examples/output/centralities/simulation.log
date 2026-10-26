@@ -1,0 +1,691 @@
+
+Crosstab (counts, incl. no-change on diagonal):
+         0      1       2      3
+0  1381843   4906    3538    744
+1        0  72337    5613    202
+2        0      0  159056   3665
+3        0      0       0  58216
+
+Annual change rates (cells/year):
+    0 -> 1: 490.6
+    0 -> 2: 353.8
+    0 -> 3: 74.4
+    1 -> 2: 561.3
+    1 -> 3: 20.2
+    2 -> 3: 366.5
+Share inside the centralities between 2010 and 2020: expansion 0.13, densification 0.26
+
+Demands (cells/year):
+    0 -> 1: 490.6
+    0 -> 2: 353.8
+    0 -> 3: 74.4
+    1 -> 2: 561.3
+    1 -> 3: 20.2
+    2 -> 3: 366.5
+
+Share inside the centralities (expansion, densification): [0.13, 0.26] in 2020, [0.13, 0.26] in 2030
+
+###################################################################
+
+Current year: 2020
+Simulating for year: 2021
+
+Share inside the centralities: expansion 0.13, densification 0.26
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 64.0 / 427.0
+    0 -> 2: 47.0 / 307.0
+    0 -> 3: 10.0 / 64.0
+    1 -> 2: 146.0 / 415.0
+    1 -> 3: 6.0 / 14.0
+    2 -> 3: 96.0 / 270.0
+
+------------------------------------------------------
+
+Year 2021: Updated built-up map summary (value: count):
+{0.0: 1380924, 1.0: 77153, 2.0: 168756, 3.0: 63287, 'nan': 2004749}
+
+###################################################################
+
+Current year: 2021
+Simulating for year: 2022
+
+Share inside the centralities: expansion 0.13, densification 0.26
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 64.0 / 427.0
+    0 -> 2: 47.0 / 307.0
+    0 -> 3: 10.0 / 64.0
+    1 -> 2: 146.0 / 415.0
+    1 -> 3: 6.0 / 14.0
+    2 -> 3: 96.0 / 270.0
+
+------------------------------------------------------
+
+Year 2022: Updated built-up map summary (value: count):
+{0.0: 1380005, 1.0: 77063, 2.0: 169305, 3.0: 63747, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2022
+Simulating for year: 2023
+
+Share inside the centralities: expansion 0.13, densification 0.26
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 64.0 / 427.0
+    0 -> 2: 47.0 / 307.0
+    0 -> 3: 10.0 / 64.0
+    1 -> 2: 146.0 / 415.0
+    1 -> 3: 6.0 / 14.0
+    2 -> 3: 96.0 / 270.0
+
+------------------------------------------------------
+
+Year 2023: Updated built-up map summary (value: count):
+{0.0: 1379086, 1.0: 76973, 2.0: 169854, 3.0: 64207, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2023
+Simulating for year: 2024
+
+Share inside the centralities: expansion 0.13, densification 0.26
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 64.0 / 427.0
+    0 -> 2: 47.0 / 307.0
+    0 -> 3: 10.0 / 64.0
+    1 -> 2: 146.0 / 415.0
+    1 -> 3: 6.0 / 14.0
+    2 -> 3: 96.0 / 270.0
+
+------------------------------------------------------
+
+Year 2024: Updated built-up map summary (value: count):
+{0.0: 1378167, 1.0: 76883, 2.0: 170403, 3.0: 64667, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2024
+Simulating for year: 2025
+
+Share inside the centralities: expansion 0.13, densification 0.26
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 64.0 / 427.0
+    0 -> 2: 47.0 / 307.0
+    0 -> 3: 10.0 / 64.0
+    1 -> 2: 146.0 / 415.0
+    1 -> 3: 6.0 / 14.0
+    2 -> 3: 96.0 / 270.0
+
+------------------------------------------------------
+
+Year 2025: Updated built-up map summary (value: count):
+{0.0: 1377248, 1.0: 76793, 2.0: 170952, 3.0: 65127, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2025
+Simulating for year: 2026
+
+Share inside the centralities: expansion 0.13, densification 0.26
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 64.0 / 427.0
+    0 -> 2: 47.0 / 307.0
+    0 -> 3: 10.0 / 64.0
+    1 -> 2: 146.0 / 415.0
+    1 -> 3: 6.0 / 14.0
+    2 -> 3: 96.0 / 270.0
+
+------------------------------------------------------
+
+Year 2026: Updated built-up map summary (value: count):
+{0.0: 1376329, 1.0: 76703, 2.0: 171501, 3.0: 65587, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2026
+Simulating for year: 2027
+
+Share inside the centralities: expansion 0.13, densification 0.26
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 64.0 / 427.0
+    0 -> 2: 47.0 / 307.0
+    0 -> 3: 10.0 / 64.0
+    1 -> 2: 146.0 / 415.0
+    1 -> 3: 6.0 / 14.0
+    2 -> 3: 96.0 / 270.0
+
+------------------------------------------------------
+
+Year 2027: Updated built-up map summary (value: count):
+{0.0: 1375410, 1.0: 76613, 2.0: 172050, 3.0: 66047, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2027
+Simulating for year: 2028
+
+Share inside the centralities: expansion 0.13, densification 0.26
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 64.0 / 427.0
+    0 -> 2: 47.0 / 307.0
+    0 -> 3: 10.0 / 64.0
+    1 -> 2: 146.0 / 415.0
+    1 -> 3: 6.0 / 14.0
+    2 -> 3: 96.0 / 270.0
+
+------------------------------------------------------
+
+Year 2028: Updated built-up map summary (value: count):
+{0.0: 1374491, 1.0: 76523, 2.0: 172599, 3.0: 66507, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2028
+Simulating for year: 2029
+
+Share inside the centralities: expansion 0.13, densification 0.26
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 64.0 / 427.0
+    0 -> 2: 47.0 / 307.0
+    0 -> 3: 10.0 / 64.0
+    1 -> 2: 146.0 / 415.0
+    1 -> 3: 6.0 / 14.0
+    2 -> 3: 96.0 / 270.0
+
+------------------------------------------------------
+
+Year 2029: Updated built-up map summary (value: count):
+{0.0: 1373572, 1.0: 76433, 2.0: 173148, 3.0: 66967, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2029
+Simulating for year: 2030
+
+Share inside the centralities: expansion 0.13, densification 0.26
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 64.0 / 427.0
+    0 -> 2: 47.0 / 307.0
+    0 -> 3: 10.0 / 64.0
+    1 -> 2: 146.0 / 415.0
+    1 -> 3: 6.0 / 14.0
+    2 -> 3: 96.0 / 270.0
+
+------------------------------------------------------
+
+Year 2030: Updated built-up map summary (value: count):
+{0.0: 1372653, 1.0: 76343, 2.0: 173697, 3.0: 67427, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+Share inside the centralities in 2030: expansion 0.13, densification 0.26
+
+Demands (cells/year):
+    0 -> 1: 490.6
+    0 -> 2: 353.8
+    0 -> 3: 74.4
+    1 -> 2: 561.3
+    1 -> 3: 20.2
+    2 -> 3: 366.5
+
+Share inside the centralities (expansion, densification): [0.13, 0.26] in 2030, [0.75, 0.75] in 2050
+
+###################################################################
+
+Current year: 2030
+Simulating for year: 2031
+
+Share inside the centralities: expansion 0.16, densification 0.28
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 79.0 / 412.0
+    0 -> 2: 57.0 / 297.0
+    0 -> 3: 12.0 / 62.0
+    1 -> 2: 158.0 / 403.0
+    1 -> 3: 6.0 / 14.0
+    2 -> 3: 103.0 / 263.0
+
+------------------------------------------------------
+
+Year 2031: Updated built-up map summary (value: count):
+{0.0: 1371734, 1.0: 76253, 2.0: 174246, 3.0: 67887, 'nan': 2004749}
+
+###################################################################
+
+Current year: 2031
+Simulating for year: 2032
+
+Share inside the centralities: expansion 0.19, densification 0.31
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 94.0 / 397.0
+    0 -> 2: 68.0 / 286.0
+    0 -> 3: 15.0 / 59.0
+    1 -> 2: 174.0 / 387.0
+    1 -> 3: 7.0 / 13.0
+    2 -> 3: 114.0 / 252.0
+
+------------------------------------------------------
+
+Year 2032: Updated built-up map summary (value: count):
+{0.0: 1370815, 1.0: 76163, 2.0: 174795, 3.0: 68347, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2032
+Simulating for year: 2033
+
+Share inside the centralities: expansion 0.22, densification 0.33
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 109.0 / 382.0
+    0 -> 2: 78.0 / 276.0
+    0 -> 3: 17.0 / 57.0
+    1 -> 2: 186.0 / 375.0
+    1 -> 3: 7.0 / 13.0
+    2 -> 3: 121.0 / 245.0
+
+------------------------------------------------------
+
+Year 2033: Updated built-up map summary (value: count):
+{0.0: 1369896, 1.0: 76073, 2.0: 175344, 3.0: 68807, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2033
+Simulating for year: 2034
+
+Share inside the centralities: expansion 0.25, densification 0.36
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 123.0 / 368.0
+    0 -> 2: 89.0 / 265.0
+    0 -> 3: 19.0 / 55.0
+    1 -> 2: 202.0 / 359.0
+    1 -> 3: 8.0 / 12.0
+    2 -> 3: 132.0 / 234.0
+
+------------------------------------------------------
+
+Year 2034: Updated built-up map summary (value: count):
+{0.0: 1368977, 1.0: 75983, 2.0: 175893, 3.0: 69267, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2034
+Simulating for year: 2035
+
+Share inside the centralities: expansion 0.29, densification 0.38
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 143.0 / 348.0
+    0 -> 2: 103.0 / 251.0
+    0 -> 3: 22.0 / 52.0
+    1 -> 2: 214.0 / 347.0
+    1 -> 3: 8.0 / 12.0
+    2 -> 3: 140.0 / 226.0
+
+------------------------------------------------------
+
+Year 2035: Updated built-up map summary (value: count):
+{0.0: 1368058, 1.0: 75893, 2.0: 176442, 3.0: 69727, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2035
+Simulating for year: 2036
+
+Share inside the centralities: expansion 0.32, densification 0.41
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 158.0 / 333.0
+    0 -> 2: 114.0 / 240.0
+    0 -> 3: 24.0 / 50.0
+    1 -> 2: 231.0 / 330.0
+    1 -> 3: 9.0 / 11.0
+    2 -> 3: 151.0 / 215.0
+
+------------------------------------------------------
+
+Year 2036: Updated built-up map summary (value: count):
+{0.0: 1367139, 1.0: 75803, 2.0: 176991, 3.0: 70187, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2036
+Simulating for year: 2037
+
+Share inside the centralities: expansion 0.35, densification 0.43
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 172.0 / 319.0
+    0 -> 2: 124.0 / 230.0
+    0 -> 3: 26.0 / 48.0
+    1 -> 2: 242.0 / 319.0
+    1 -> 3: 9.0 / 11.0
+    2 -> 3: 158.0 / 208.0
+
+------------------------------------------------------
+
+Year 2037: Updated built-up map summary (value: count):
+{0.0: 1366220, 1.0: 75713, 2.0: 177540, 3.0: 70647, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2037
+Simulating for year: 2038
+
+Share inside the centralities: expansion 0.38, densification 0.46
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 187.0 / 304.0
+    0 -> 2: 135.0 / 219.0
+    0 -> 3: 29.0 / 45.0
+    1 -> 2: 259.0 / 302.0
+    1 -> 3: 10.0 / 10.0
+    2 -> 3: 169.0 / 197.0
+
+------------------------------------------------------
+
+Year 2038: Updated built-up map summary (value: count):
+{0.0: 1365301, 1.0: 75623, 2.0: 178089, 3.0: 71107, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2038
+Simulating for year: 2039
+
+Share inside the centralities: expansion 0.41, densification 0.48
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 202.0 / 289.0
+    0 -> 2: 146.0 / 208.0
+    0 -> 3: 31.0 / 43.0
+    1 -> 2: 270.0 / 291.0
+    1 -> 3: 10.0 / 10.0
+    2 -> 3: 176.0 / 190.0
+
+------------------------------------------------------
+
+Year 2039: Updated built-up map summary (value: count):
+{0.0: 1364382, 1.0: 75533, 2.0: 178638, 3.0: 71567, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2039
+Simulating for year: 2040
+
+Share inside the centralities: expansion 0.44, densification 0.51
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 217.0 / 274.0
+    0 -> 2: 156.0 / 198.0
+    0 -> 3: 33.0 / 41.0
+    1 -> 2: 287.0 / 274.0
+    1 -> 3: 11.0 / 9.0
+    2 -> 3: 187.0 / 179.0
+
+------------------------------------------------------
+
+Year 2040: Updated built-up map summary (value: count):
+{0.0: 1363463, 1.0: 75443, 2.0: 179187, 3.0: 72027, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2040
+Simulating for year: 2041
+
+Share inside the centralities: expansion 0.47, densification 0.53
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 231.0 / 260.0
+    0 -> 2: 167.0 / 187.0
+    0 -> 3: 35.0 / 39.0
+    1 -> 2: 298.0 / 263.0
+    1 -> 3: 11.0 / 9.0
+    2 -> 3: 194.0 / 172.0
+
+------------------------------------------------------
+
+Year 2041: Updated built-up map summary (value: count):
+{0.0: 1362544, 1.0: 75353, 2.0: 179736, 3.0: 72487, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2041
+Simulating for year: 2042
+
+Share inside the centralities: expansion 0.5, densification 0.55
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 246.0 / 245.0
+    0 -> 2: 177.0 / 177.0
+    0 -> 3: 37.0 / 37.0
+    1 -> 2: 309.0 / 252.0
+    1 -> 3: 11.0 / 9.0
+    2 -> 3: 202.0 / 164.0
+
+------------------------------------------------------
+
+Year 2042: Updated built-up map summary (value: count):
+{0.0: 1361625, 1.0: 75263, 2.0: 180285, 3.0: 72947, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2042
+Simulating for year: 2043
+
+Share inside the centralities: expansion 0.53, densification 0.58
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 261.0 / 230.0
+    0 -> 2: 188.0 / 166.0
+    0 -> 3: 40.0 / 34.0
+    1 -> 2: 326.0 / 235.0
+    1 -> 3: 12.0 / 8.0
+    2 -> 3: 213.0 / 153.0
+
+------------------------------------------------------
+
+Year 2043: Updated built-up map summary (value: count):
+{0.0: 1360706, 1.0: 75173, 2.0: 180834, 3.0: 73407, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2043
+Simulating for year: 2044
+
+Share inside the centralities: expansion 0.56, densification 0.6
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 275.0 / 216.0
+    0 -> 2: 199.0 / 155.0
+    0 -> 3: 42.0 / 32.0
+    1 -> 2: 337.0 / 224.0
+    1 -> 3: 12.0 / 8.0
+    2 -> 3: 220.0 / 146.0
+
+------------------------------------------------------
+
+Year 2044: Updated built-up map summary (value: count):
+{0.0: 1359787, 1.0: 75083, 2.0: 181383, 3.0: 73867, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2044
+Simulating for year: 2045
+
+Share inside the centralities: expansion 0.59, densification 0.63
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 290.0 / 201.0
+    0 -> 2: 209.0 / 145.0
+    0 -> 3: 44.0 / 30.0
+    1 -> 2: 354.0 / 207.0
+    1 -> 3: 13.0 / 7.0
+    2 -> 3: 231.0 / 135.0
+
+------------------------------------------------------
+
+Year 2045: Updated built-up map summary (value: count):
+{0.0: 1358868, 1.0: 74993, 2.0: 181932, 3.0: 74327, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2045
+Simulating for year: 2046
+
+Share inside the centralities: expansion 0.63, densification 0.65
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 310.0 / 181.0
+    0 -> 2: 224.0 / 130.0
+    0 -> 3: 47.0 / 27.0
+    1 -> 2: 365.0 / 196.0
+    1 -> 3: 13.0 / 7.0
+    2 -> 3: 238.0 / 128.0
+
+------------------------------------------------------
+
+Year 2046: Updated built-up map summary (value: count):
+{0.0: 1357949, 1.0: 74903, 2.0: 182481, 3.0: 74787, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2046
+Simulating for year: 2047
+
+Share inside the centralities: expansion 0.66, densification 0.68
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 325.0 / 166.0
+    0 -> 2: 234.0 / 120.0
+    0 -> 3: 49.0 / 25.0
+    1 -> 2: 382.0 / 179.0
+    1 -> 3: 14.0 / 6.0
+    2 -> 3: 249.0 / 117.0
+
+------------------------------------------------------
+
+Year 2047: Updated built-up map summary (value: count):
+{0.0: 1357030, 1.0: 74813, 2.0: 183030, 3.0: 75247, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2047
+Simulating for year: 2048
+
+Share inside the centralities: expansion 0.69, densification 0.7
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 339.0 / 152.0
+    0 -> 2: 245.0 / 109.0
+    0 -> 3: 52.0 / 22.0
+    1 -> 2: 393.0 / 168.0
+    1 -> 3: 14.0 / 6.0
+    2 -> 3: 257.0 / 109.0
+
+------------------------------------------------------
+
+Year 2048: Updated built-up map summary (value: count):
+{0.0: 1356111, 1.0: 74723, 2.0: 183579, 3.0: 75707, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2048
+Simulating for year: 2049
+
+Share inside the centralities: expansion 0.72, densification 0.73
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 354.0 / 137.0
+    0 -> 2: 255.0 / 99.0
+    0 -> 3: 54.0 / 20.0
+    1 -> 2: 410.0 / 151.0
+    1 -> 3: 15.0 / 5.0
+    2 -> 3: 268.0 / 98.0
+
+------------------------------------------------------
+
+Year 2049: Updated built-up map summary (value: count):
+{0.0: 1355192, 1.0: 74633, 2.0: 184128, 3.0: 76167, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
+
+###################################################################
+
+Current year: 2049
+Simulating for year: 2050
+
+Share inside the centralities: expansion 0.75, densification 0.75
+Demands inside / outside the centralities (cells/year):
+    0 -> 1: 369.0 / 122.0
+    0 -> 2: 266.0 / 88.0
+    0 -> 3: 56.0 / 18.0
+    1 -> 2: 421.0 / 140.0
+    1 -> 3: 15.0 / 5.0
+    2 -> 3: 275.0 / 91.0
+
+------------------------------------------------------
+
+Year 2050: Updated built-up map summary (value: count):
+{0.0: 1354273, 1.0: 74543, 2.0: 184677, 3.0: 76627, 'nan': 2004749}
+
+Changes from previous year summary (value: count):
+{0: -919, 1: -90, 2: 549, 3: 460}
