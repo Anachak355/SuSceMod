@@ -1,5 +1,4 @@
 import numpy as np
-from . import input_handling
 
 def neighborhood_counts_for_targets(built_up_map, target_classes):
     """
@@ -32,7 +31,6 @@ def neighborhood_counts_for_targets(built_up_map, target_classes):
         counts_by_class[j] = counts.astype(np.int16, copy=False)
 
     return counts_by_class
-
 
 def calc_transition_potentials(built_up_map, prob_maps_dict):
     """
@@ -78,16 +76,6 @@ def calc_transition_potentials(built_up_map, prob_maps_dict):
         potentials[(i, j)] = pot
 
     return potentials
-
-
-def calc_transition_acceptance(trans_pot_arrays):
-    trans_bool_arrays = [trans_pot_arrays[k] > np.random.rand(*trans_pot_arrays[k].shape) for k in range(6)]
-    trans_bool_exp0_1, trans_bool_exp0_2, trans_bool_exp0_3, trans_bool_dens1_2, trans_bool_dens1_3, trans_bool_dens2_3 = trans_bool_arrays
-    
-    trans_bool_exp = [trans_bool_exp0_1, trans_bool_exp0_2, trans_bool_exp0_3]
-    trans_bool_dens = [trans_bool_dens1_2, trans_bool_dens1_3, trans_bool_dens2_3]
-    
-    return trans_bool_exp, trans_bool_dens
 
 def calc_eligible_indices_generic(built_up_map, potentials, annual_rates, sort=True, zone_mask=None):
     """
@@ -136,125 +124,3 @@ def calc_eligible_indices_generic(built_up_map, potentials, annual_rates, sort=T
         elig[(i, j)] = cand
 
     return elig
-
-
-
-def split_demand_by_zone(annual_rates, shares):
-    """
-    Split the demand of every transition into a part inside and a part outside the centralities.
-
-    Args:
-        annual_rates: Dict[(from, to)] -> demand in cells for the year
-        shares: [share of expansion inside, share of densification inside]; expansion is any
-                transition from class 0, densification is any other transition
-
-    Returns:
-        inside, outside: two Dict[(from, to)] -> whole cells. For every transition they add up
-        to the rounded demand; if rounding loses a cell, it goes to the inside part.
-    """
-    inside, outside = {}, {}
-    for (i, j), rate in annual_rates.items():
-        share = shares[0] if int(i) == 0 else shares[1]
-        total = max(0, int(round(rate)))
-        out = int(np.floor(round(total * (1 - share), 2)))
-        inside[(i, j)] = float(total - out)
-        outside[(i, j)] = float(out)
-    return inside, outside
-
-def calc_eligible_indices_fast(built_up_map, trans_pot_arrays, water_zone=None, central_zones=None, allocate_central=False, sorting=False):
-    # Set defaults for optional arguments
-    if water_zone is None:
-        water_zone = np.zeros_like(built_up_map)
-    if central_zones is None:
-        central_zones = np.zeros_like(built_up_map)
-    
-    # Define masks for each condition
-    is_empty = built_up_map == 0
-    is_built = np.isin(built_up_map, [1, 2])
-    not_in_water = water_zone != 1
-    in_central = central_zones == 1
-    not_in_central = central_zones == 0
-    
-    # Apply conditions based on arguments
-    if np.any(central_zones):
-        if allocate_central:
-            zone_mask = in_central
-        else:
-            zone_mask = not_in_central
-    else:
-        zone_mask = np.ones_like(built_up_map, dtype=bool)  # No central zones, all valid
-
-    valid_expansion_mask = is_empty & zone_mask & not_in_water
-    valid_densification_mask = is_built & zone_mask & not_in_water
-
-    # Get eligible indices
-    expansions = np.argwhere(valid_expansion_mask)
-    densifications = np.argwhere(valid_densification_mask)
-
-    # Apply sorting if required
-    if sorting:
-        def expansion_key(pos):
-            return sum(trans_pot_arrays[i][tuple(pos)] for i in range(3))
-        
-        def densification_key(pos):
-            return sum(trans_pot_arrays[i + 3][tuple(pos)] for i in range(3))
-        
-        expansions = sorted(expansions, key=expansion_key, reverse=True)
-        densifications = sorted(densifications, key=densification_key, reverse=True)
-
-    return expansions, densifications
-
-def calculate_decrease_rate(initial_year, final_year, annual_change_rates):
-    decrease_rates = [round(a_r/((final_year - initial_year)), 2) for a_r in annual_change_rates]
-    print("Annual decrease in rate of expansion: ", decrease_rates, "hectare/year")
-    return decrease_rates
-
-def calculate_central_percentages(initial_year, final_year, initial_central_percentages, final_central_percentages):
-    
-    inc_vals = [(final_central_percentages[i] - initial_central_percentages[i]) / (final_year - initial_year) for i in range(len(initial_central_percentages))  ]
-    percentages = {}
-    for i in range(final_year - initial_year + 1):
-        year = initial_year + i
-        percentages[year] = [
-            round(initial_central_percentages[0] + inc_vals[0] * i, 2),
-            round(initial_central_percentages[1] + inc_vals[1] * i, 2)
-        ]
-        
-    return percentages
-
-def check_decimals(current_demands_exp_central, current_demands_exp_non_central, current_demands_dens_central, current_demands_dens_non_central, current_demands_exp, current_demands_dens):
-    cdec = np.floor(current_demands_exp_central).astype(int)
-    cdenc = np.floor(current_demands_exp_non_central).astype(int)
-    cddc = np.floor(current_demands_dens_central).astype(int)
-    cddnc = np.floor(current_demands_dens_non_central).astype(int)
-    cde = np.floor(current_demands_exp).astype(int)
-    cdd = np.floor(current_demands_dens).astype(int)
-    
-    
-    for i in range(len(cde)):
-        if cdec[i] + cdenc[i] < cde[i]:
-            current_demands_exp_central[i] += 1
-            
-    for i in range(len(cdd)):
-        if cddc[i] + cddnc[i] < cdd[i]:
-            current_demands_dens_central[i] += 1
-    
-    return current_demands_exp_central, current_demands_exp_non_central, current_demands_dens_central, current_demands_dens_non_central
-
-def extrapolate_demand_yearly(parent_raster_folder, zoning_type, change_years):
-    annual_change_rates_exp_1, annual_change_rates_dens_1 = input_handling.calculate_change_rates(parent_raster_folder, zoning_type, change_years[0])
-    annual_change_rates_exp_2, annual_change_rates_dens_2 = input_handling.calculate_change_rates(parent_raster_folder, zoning_type, change_years[1])
-    
-    decrease_rates_exp = [(a-b)/10 for a, b in zip(annual_change_rates_exp_1, annual_change_rates_exp_2)]
-    decrease_rates_dens = [(a-b)/10 for a, b in zip(annual_change_rates_dens_1, annual_change_rates_dens_2)]
-    
-    return decrease_rates_exp, decrease_rates_dens
-
-def extrapolate_demand(parent_raster_folder, zoning_type, change_years):
-    annual_change_rates_exp_1, annual_change_rates_dens_1 = input_handling.calculate_change_rates(parent_raster_folder, zoning_type, change_years[0])
-    annual_change_rates_exp_2, annual_change_rates_dens_2 = input_handling.calculate_change_rates(parent_raster_folder, zoning_type, change_years[1])
-    
-    decrease_rates_exp = [(a-b) for a, b in zip(annual_change_rates_exp_1, annual_change_rates_exp_2)]
-    decrease_rates_dens = [(a-b) for a, b in zip(annual_change_rates_dens_1, annual_change_rates_dens_2)]
-    
-    return decrease_rates_exp, decrease_rates_dens
