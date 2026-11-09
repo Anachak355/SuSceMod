@@ -265,9 +265,19 @@ def test_constant_demand_is_the_same_every_year():
 
 
 def test_trend_demand_changes_every_year_and_never_goes_below_zero():
+    # the first step is already applied in year 1
     schedule = demand.trend_demand({(0, 1): 10.0, (1, 2): 5.0}, {(0, 1): -4.0, (1, 2): 1.5}, 4)
-    assert [rates[(0, 1)] for rates, _ in schedule] == [10.0, 6.0, 2.0, 0.0]
-    assert [rates[(1, 2)] for rates, _ in schedule] == [5.0, 6.5, 8.0, 9.5]
+    assert [rates[(0, 1)] for rates, _ in schedule] == [6.0, 2.0, 0.0, 0.0]
+    assert [rates[(1, 2)] for rates, _ in schedule] == [6.5, 8.0, 9.5, 11.0]
+
+
+def test_trend_demand_year_one_is_baseline_plus_one_step():
+    # baseline of 2010-2020 and the change per year of the example rasters
+    baseline = {(0, 1): 490.6, (0, 2): 353.8, (1, 2): 561.3}
+    change = {(0, 1): -22.63, (0, 2): -17.09, (1, 2): -23.07}
+    schedule = demand.trend_demand(baseline, change, 3)
+    assert schedule[0][0] == {(0, 1): 467.97, (0, 2): 336.71, (1, 2): 538.23}
+    assert schedule[2][0][(0, 1)] == round(490.6 - 3 * 22.63, 2)
 
 
 def test_densification_only_demand_phases_expansion_out_and_adds_it_to_densification():
@@ -332,10 +342,10 @@ def test_business_as_usual_can_force_a_share_too(world):
     sims, _, _ = quiet(scenarios.simulate_density_based_scenario, 2020, 2023, built_up, probs, rates, {(0, 1): -10.0, (1, 2): -5.0}, "out",
                        central_zones=zones, central_shares=[0.5, 0.5], seed=3)
     first = sims[2021]
-    assert int(((built_up == 0) & (first == 1)).sum()) == 60
-    assert int(((built_up == 0) & (first == 1) & (zones == 1)).sum()) == 30
+    assert int(((built_up == 0) & (first == 1)).sum()) == 50   # the first step is already applied: 60 - 10
+    assert int(((built_up == 0) & (first == 1) & (zones == 1)).sum()) == 25
     second = sims[2022]
-    assert int(((first == 0) & (second == 1)).sum()) == 50   # the demand fell by 10
+    assert int(((first == 0) & (second == 1)).sum()) == 40   # the demand fell by 10 again
 
 
 def test_densification_only_with_centralities_follows_the_original_rule(world):

@@ -56,6 +56,15 @@ def test_growth_based_matches_saved_output(inputs):
     assert_same_as_saved("growth_based", maps)
 
 
+def test_historical_change_rates_are_per_year(inputs):
+    _, _, _, rates_h, differential = inputs
+    assert rates_h[(0, 1)] == 490.6
+    # (rate of 2010-2020 minus rate of 2000-2010) divided by the 10 years between the centres of the periods
+    assert differential[(0, 1)] == -22.63
+    assert differential[(1, 2)] == -23.07
+    assert differential[(2, 3)] == -4.5
+
+
 def test_density_based_matches_saved_output(inputs):
     initial, prob_maps, _, rates_h, differential = inputs
     maps = quiet(scenarios.simulate_density_based_scenario, 2020, 2030, initial, prob_maps, rates_h, differential, "out",
