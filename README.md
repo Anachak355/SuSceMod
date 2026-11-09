@@ -31,7 +31,7 @@ maps, paths, class_counts = scenarios.simulate_densification_only_scenario(
 for year, sim in maps.items():
     data_utilities.writeraster("input_rasters/BU_2020.tif", paths[year], sim)
 ```
-The growth-based scenario takes the same arguments. The density-based scenario also takes `differential_change_rates` after `annual_rates`. See the notebooks in `examples/` for each one.
+The growth-based scenario takes the same arguments. The density-based scenario also takes `differential_change_rates` after `annual_rates`: the change of the demand per year, which `input_handling.calculate_change_rates_historical` calculates from three years of maps. See the notebooks in `examples/` for each one.
 
 ## Input data
 - **Built-up maps:** single-band rasters on the same grid. Cells hold a density class: 0 for empty and 1, 2, 3 for increasing built-up density. Cells outside the study area are NaN.
@@ -75,7 +75,7 @@ This is the main engine for the simulation. It is split by what each part decide
 
 The scenarios in `scenarios.py`:
 - `simulate_growth_based_scenario` (Growth-As-Usual, GAU): keeps the historical annual demand for every transition constant
-- `simulate_density_based_scenario` (Business-As-Usual, BAU): changes the demand every year, following the trend between two historical periods
+- `simulate_density_based_scenario` (Business-As-Usual, BAU): changes the demand every year by a fixed step per year, following the trend between two historical periods (year k has the demand of the last period plus k steps, never below zero)
 - `simulate_densification_only_scenario` (Densification Only, DO): reduces the demand for expansion (class 0 to 1, 2 and 3) linearly to zero by the final year. The cells this frees up are added to the densification demand (1 to 2, 1 to 3 and 2 to 3)
 - `simulate_centralities_scenario`: keeps the demand constant, as in GAU, but allocates a growing share of it inside the centralities. The share moves in equal yearly steps from its starting value to a target, 75% by default. Measure the starting share from two maps with `input_handling.calculate_central_shares`
 
