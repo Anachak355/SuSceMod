@@ -12,6 +12,7 @@ import rasterio
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 
 from SuSceMod.simulation import data_utilities, input_handling, scenarios
 
@@ -24,7 +25,8 @@ SCENARIOS = [
     ("density_based", "Density-based", "#eb6834"),
     ("densification_only", "Densification-only", "#1baf7a"),
 ]
-INK, MUTED, GRID = "#0b0b0b", "#52514e", "#e4e3df"
+INK, MUTED, GRID = "#0b0b0b", "#3f3e3b", "#cfcdc8"
+BASE_GREY = "#97958f"  # the built-up cells before the simulation, dark enough to see on white
 
 plt.rcParams.update({
     "figure.facecolor": "white", "axes.facecolor": "white", "savefig.facecolor": "white",
@@ -38,34 +40,67 @@ def read(path):
         return src.read(1)
 
 
+def built_up_extent(built_up, pad=20):
+    """Column and row limits around the built-up cells, and the height / width of that box."""
+    rows, cols = np.nonzero(built_up > 0)
+    xlim = (cols.min() - pad, cols.max() + pad)
+    ylim = (rows.max() + pad, rows.min() - pad)
+    return xlim, ylim, (ylim[0] - ylim[1]) / (xlim[1] - xlim[0])
+
+
+def map_figure(n_panels, ratio, panel_title_lines=1, width=7.0, margin=0.35):
+    """
+    A figure of n_panels maps below each other. Every map has exactly the shape of the study area and sits
+    in the middle of the figure, with its title centred above it.
+    """
+    title_h = 0.3 + 0.2 * panel_title_lines
+    top, bottom = 0.75, 0.2
+    panel_h = width * ratio
+    fig_w = width + 2 * margin
+    fig_h = top + n_panels * (panel_h + title_h) + bottom
+    fig = plt.figure(figsize=(fig_w, fig_h))
+    axes = []
+    for i in range(n_panels):
+        y_bottom = fig_h - top - (i + 1) * (panel_h + title_h)   # title_h of space above every map for its title
+        ax = fig.add_axes([margin / fig_w, y_bottom / fig_h, width / fig_w, panel_h / fig_h])
+        axes.append(ax)
+    return fig, axes, fig_h
+
+
+def draw_map(ax, start, changed, color, xlim, ylim, title):
+    """The built-up cells before the simulation in grey, the cells that changed in colour."""
+    ax.imshow(np.where(start > 0, 0.0, np.nan), cmap=ListedColormap([BASE_GREY]), vmin=0, vmax=1,
+              interpolation="nearest")
+    rows, cols = np.nonzero(changed)
+    ax.scatter(cols, rows, s=1.6, color=color, linewidths=0)
+    ax.set_xlim(*xlim)
+    ax.set_ylim(*ylim)
+    ax.set_aspect("equal")
+    ax.set_title(title, loc="center", fontsize=11, pad=8)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+
+
 def figure_changes():
     start = read(os.path.join(EXAMPLES, "input_rasters", "BU_2020.tif"))
-    fig, axes = plt.subplots(len(SCENARIOS), 1, figsize=(8, 3.2 * len(SCENARIOS)))
-    rows_b, cols_b = np.nonzero(start > 0)
-    pad = 20
+    xlim, ylim, ratio = built_up_extent(start)
+    fig, axes, fig_h = map_figure(len(SCENARIOS), ratio)
     for ax, (folder, label, color) in zip(axes, SCENARIOS):
         end = read(os.path.join(EXAMPLES, "output", folder, "sim_2030.tif"))
         changed = (end != start) & ~np.isnan(end)
-        ax.imshow(np.where(start > 0, 1.0, np.nan), cmap="Greys", vmin=0, vmax=3, interpolation="nearest")
-        rows, cols = np.nonzero(changed)
-        ax.scatter(cols, rows, s=2.5, color=color, linewidths=0)
-        ax.set_title(f"{label}: {int(changed.sum()):,} cells changed", loc="left", fontsize=11)
-        ax.set_xlim(cols_b.min() - pad, cols_b.max() + pad)
-        ax.set_ylim(rows_b.max() + pad, rows_b.min() - pad)
-        ax.set_xticks([])
-        ax.set_yticks([])
-        for spine in ax.spines.values():
-            spine.set_visible(False)
-    fig.suptitle("Cells that change between 2020 and 2030 (grey = built-up in 2020)", x=0.01, ha="left", fontsize=12)
-    fig.tight_layout(rect=(0, 0, 1, 0.97))
-    fig.savefig(os.path.join(OUT, "scenario_changes.png"), dpi=100, bbox_inches="tight", pad_inches=0.15)
+        draw_map(ax, start, changed, color, xlim, ylim, f"{label}: {int(changed.sum()):,} cells changed")
+    fig.suptitle("Cells that change between 2020 and 2030\n(grey = built-up in 2020)", x=0.5, y=1 - 0.1 / fig_h,
+                 ha="center", va="top", fontsize=12)
+    fig.savefig(os.path.join(OUT, "scenario_changes.png"), dpi=100)
     plt.close(fig)
 
 
 def figure_trends():
     start = read(os.path.join(EXAMPLES, "input_rasters", "BU_2020.tif"))
     start_counts = {c: int(np.sum(start == c)) for c in range(4)}
-    fig, axes = plt.subplots(1, 4, figsize=(12, 3.4), sharex=True)
+    fig, axes = plt.subplots(1, 4, figsize=(12, 4), sharex=True)
     for folder, label, color in SCENARIOS:
         df = pd.read_csv(os.path.join(EXAMPLES, "output", folder, "class_counts_2020_2030.csv"), index_col=0)
         df = df[~df.index.astype(str).isin(["nan"])]
@@ -74,17 +109,18 @@ def figure_trends():
             values = [0] + list(df.loc[float(c)].values - start_counts[c])
             ax.plot(years, values, color=color, linewidth=2, label=label)
     for ax, c in zip(axes, range(4)):
-        ax.set_title(f"Class {c}", loc="left", fontsize=11)
-        ax.axhline(0, color=GRID, linewidth=1)
+        ax.set_title(f"Class {c}", loc="center", fontsize=11)
+        ax.axhline(0, color=MUTED, linewidth=1)
         ax.grid(axis="y", color=GRID, linewidth=0.8)
         ax.set_axisbelow(True)
         ax.set_xticks([2020, 2025, 2030])
         for side in ("top", "right"):
             ax.spines[side].set_visible(False)
     axes[0].set_ylabel("Change in cells since 2020")
-    axes[0].legend(frameon=False, fontsize=9, loc="best")
-    fig.suptitle("Change in cell count per density class", x=0.01, ha="left", fontsize=12)
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=len(SCENARIOS), frameon=False, fontsize=10)
+    fig.suptitle("Change in cell count per density class", x=0.5, ha="center", fontsize=12)
+    fig.tight_layout(rect=(0, 0.08, 1, 0.94))
     fig.savefig(os.path.join(OUT, "class_trends.png"), dpi=100)
     plt.close(fig)
 
@@ -128,30 +164,20 @@ def centralities_runs():
 def figure_centralities_maps(runs):
     start_2030, gau, centralities, zones = runs
     built_up = read(os.path.join(EXAMPLES, "input_rasters", "BU_2020.tif"))
-    rows_b, cols_b = np.nonzero(built_up > 0)
-    pad = 20
+    xlim, ylim, ratio = built_up_extent(built_up)
     panels = [("Growth-As-Usual", GAU_COLOR, gau[2050]), ("Centralities", CENTRALITIES_COLOR, centralities[2050])]
 
-    fig, axes = plt.subplots(len(panels), 1, figsize=(8, 3.4 * len(panels)))
+    fig, axes, fig_h = map_figure(len(panels), ratio, panel_title_lines=2)
     for ax, (label, color, end) in zip(axes, panels):
         changed = (end != start_2030) & ~np.isnan(end)
         exp_share, dens_share = input_handling.calculate_central_shares(start_2030, end, zones, decimals=2)
-        ax.imshow(np.where(start_2030 > 0, 1.0, np.nan), cmap="Greys", vmin=0, vmax=3, interpolation="nearest")
-        ax.contour((zones == 1).astype(float), levels=[0.5], colors=INK, linewidths=0.5)
-        rows, cols = np.nonzero(changed)
-        ax.scatter(cols, rows, s=2.5, color=color, linewidths=0)
-        ax.set_title(f"{label}: {int(changed.sum()):,} cells changed, {exp_share:.0%} of the expansion and "
-                     f"{dens_share:.0%} of the densification inside the centralities", loc="left", fontsize=10)
-        ax.set_xlim(cols_b.min() - pad, cols_b.max() + pad)
-        ax.set_ylim(rows_b.max() + pad, rows_b.min() - pad)
-        ax.set_xticks([])
-        ax.set_yticks([])
-        for spine in ax.spines.values():
-            spine.set_visible(False)
-    fig.suptitle("Cells that change between 2030 and 2050 (grey = built-up in 2030, black line = centralities)",
-                 x=0.01, ha="left", fontsize=12)
-    fig.tight_layout(rect=(0, 0, 1, 0.97))
-    fig.savefig(os.path.join(OUT, "centralities_maps.png"), dpi=100, bbox_inches="tight", pad_inches=0.15)
+        title = (f"{label}: {int(changed.sum()):,} cells changed\n"
+                 f"{exp_share:.0%} of the expansion and {dens_share:.0%} of the densification inside the centralities")
+        draw_map(ax, start_2030, changed, color, xlim, ylim, title)
+        ax.contour((zones == 1).astype(float), levels=[0.5], colors=INK, linewidths=0.6)
+    fig.suptitle("Cells that change between 2030 and 2050\n(grey = built-up in 2030, black line = centralities)",
+                 x=0.5, y=1 - 0.1 / fig_h, ha="center", va="top", fontsize=12)
+    fig.savefig(os.path.join(OUT, "centralities_maps.png"), dpi=100)
     plt.close(fig)
 
 
@@ -176,10 +202,11 @@ def figure_centralities_shares(runs):
     ax.set_ylabel("Share of the change inside the centralities")
     for side in ("top", "right"):
         ax.spines[side].set_visible(False)
-    ax.legend(frameon=False, fontsize=9, loc="center left", bbox_to_anchor=(0.0, 0.55))
-    ax.set_title("Share of each year's change inside the centralities", loc="left", fontsize=12)
+    # the legend below the plot, so it does not cover the lines
+    ax.legend(frameon=False, fontsize=9, loc="upper center", bbox_to_anchor=(0.5, -0.1), ncol=2)
+    ax.set_title("Share of each year's change inside the centralities", loc="center", fontsize=12, pad=10)
     fig.tight_layout()
-    fig.savefig(os.path.join(OUT, "centralities_shares.png"), dpi=100, bbox_inches="tight", pad_inches=0.15)
+    fig.savefig(os.path.join(OUT, "centralities_shares.png"), dpi=100, bbox_inches="tight", pad_inches=0.2)
     plt.close(fig)
 
 
