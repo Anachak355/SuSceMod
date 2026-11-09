@@ -17,10 +17,12 @@ def constant_demand(annual_rates, n_years):
 def trend_demand(annual_rates, differential_change_rates, n_years):
     """
     The demand changes every year by a fixed amount per transition (Business-As-Usual), and never goes below zero.
+    The first step is already applied in the first year: year k has the demand annual_rates + k * the change.
 
     Args:
-        annual_rates: Dict[(from, to)] -> demand in the first year
-        differential_change_rates: Dict[(from, to)] -> change in demand per year, can be negative
+        annual_rates: Dict[(from, to)] -> demand in the last observed period, in cells per year
+        differential_change_rates: Dict[(from, to)] -> change of the demand per year (cells per year, per year),
+            can be negative, e.g. from input_handling.calculate_change_rates_historical
         n_years: number of years to simulate
     """
     delta = {k: float(v) for k, v in (differential_change_rates or {}).items()}
@@ -28,13 +30,13 @@ def trend_demand(annual_rates, differential_change_rates, n_years):
 
     schedule = []
     for _ in range(n_years):
-        schedule.append((dict(current), {}))
         # advance the rates by one year, clamped to >= 0
         following = {}
         for k in set(current) | set(delta):
             value = round(current.get(k, 0.0) + delta.get(k, 0.0), 2)
             following[k] = 0.0 if value < 0 else value
         current = following
+        schedule.append((dict(current), {}))
     return schedule
 
 

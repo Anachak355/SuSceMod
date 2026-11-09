@@ -194,14 +194,16 @@ def simulate_density_based_scenario(
 ):
     """
     Business-As-Usual (BAU): the demand changes every year by a fixed amount, which follows the trend between
-    two historical periods. Demand never goes below zero.
+    two historical periods. The first step is already applied in the first simulated year
+    (year k uses annual_rates + k * differential_change_rates). Demand never goes below zero.
 
     Args:
         initial_year, final_year: simulates the years initial_year + 1 to final_year
         initial_built_up_map: 2D float array of density classes, NaN outside the study area
         prob_maps_dict: Dict[(from, to)] -> 2D suitability array, normalised to [0, 1]
         annual_rates: Dict[(from, to)] -> demand in cells per year in the first year
-        differential_change_rates: Dict[(from, to)] -> change in demand per year, can be negative
+        differential_change_rates: Dict[(from, to)] -> change of the demand per year (cells per year, per year),
+            can be negative, e.g. from calculate_change_rates_historical
         output_folder: folder the simulated maps are meant to be saved in; used to build output_paths
         randomness: how the cells are chosen: "gumbel" (default), "jitter", "none" or "acceptance",
             the original rule of the model. See allocation.update_built_up_map
