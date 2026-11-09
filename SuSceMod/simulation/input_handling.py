@@ -190,6 +190,18 @@ def calculate_change_rates(change_maps_dict, change_years, print_summary=True):
     return annual_change_rates, period_counts, crosstab_df
 
 def calculate_change_rates_historical(change_maps_dict_1, change_maps_dict_2, change_years, print_summary=True):
+    """
+    Annual rates of the second period and how much they change per year compared with the first period.
+
+    change_years = [start1, split, end2]. The rates of the two periods are centred (end2 - start1) / 2 years apart
+    (10 years for [2000, 2010, 2020]), so the change per year is (rate_2 - rate_1) / that gap.
+    This assumes the two periods are equally long (e.g. 2000-2010 and 2010-2020).
+    Only transitions whose rate fell are returned in the change rates.
+
+    Returns: (annual_rates_2, change_rates, period_counts_2, crosstab_df_2)
+        annual_rates_2: Dict[(from, to)] -> cells/year in the second period
+        change_rates: Dict[(from, to)] -> change of cells/year per year (negative)
+    """
     if not isinstance(change_years, (list, tuple)) or len(change_years) != 3:
         raise ValueError("change_years must be [start1, split, end2].")
 
@@ -203,11 +215,16 @@ def calculate_change_rates_historical(change_maps_dict_1, change_maps_dict_2, ch
         change_maps_dict_2, [split, end2], print_summary=False
     )
 
-    # Decrease = positive drop from dict_1 → dict_2
+    # Change per year: the rates of the two periods are (end2 - start1) / 2 years apart
+    gap = (end2 - start1) / 2
+    if gap <= 0:
+        raise ValueError("change_years must be increasing.")
+
+    # Decrease = drop from dict_1 → dict_2, spread over the gap
     all_keys = set(annual_rates_1).union(annual_rates_2)
     change_rates = {}
     for k in all_keys:
-        dec = round(annual_rates_2.get(k, 0.0) - annual_rates_1.get(k, 0.0), 2)
+        dec = round((annual_rates_2.get(k, 0.0) - annual_rates_1.get(k, 0.0)) / gap, 2)
         if dec < 0:
             change_rates[k] = dec
 
@@ -218,7 +235,7 @@ def calculate_change_rates_historical(change_maps_dict_1, change_maps_dict_2, ch
         for (i, j), rate in sorted(annual_rates_2.items()):
             print(f"    -> {i} → {j}: {rate}")
         if change_rates:
-            print(f"\nChanges vs. dict_1 [{start1}–{split}] (cells/year):")
+            print(f"\nChange per year vs. dict_1 [{start1}–{split}] (cells/year per year):")
             for (i, j), dec in sorted(change_rates.items()):
                 print(f"    ↓ {i} → {j}: {dec}")
         else:
