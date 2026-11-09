@@ -133,7 +133,7 @@ def simulate_density_based_scenario(
     prob_maps_dict,
     change_years,
     annual_rates,          # baseline per-annum rates for year 1
-    differential_change_rates,        # treat as signed change per year (rename to change_rates if you like)
+    differential_change_rates,        # signed change of the demand per year (cells/year per year), e.g. from calculate_change_rates_historical
     output_folder,
     parent_folder,
     randomness='gumbel',
@@ -145,7 +145,7 @@ def simulate_density_based_scenario(
     # Interpret 'differential_change_rates' as signed per-year deltas (change rates)
     delta_rates = {k: float(v) for k, v in (differential_change_rates or {}).items()}
 
-    # Start from the given baseline for Year 1
+    # Start from the given baseline (the rates of the last observed period)
     current_rates = {k: float(v) for k, v in annual_rates.items()}
 
     # Helper: advance rates by one year using the per-year deltas, clamp to >= 0
@@ -159,19 +159,20 @@ def simulate_density_based_scenario(
             nxt[k] = new_val
         return nxt
 
-    # Nice prints of baseline and the first "changed" rates (for Year 2)
-    print("\nDemands (cells/year) — Year 1 (baseline):")
+    # The first step is already applied in Year 1 (demand of year k = baseline + k * change, clamped to >= 0)
+    print("\nBaseline demands (cells/year):")
     for (i, j), rate in sorted(current_rates.items()):
         print(f"    -> {i} → {j}: {rate}")
 
-    preview_year2 = step_rates(current_rates, delta_rates)
-    print("\nDemands (cells/year) — Year 2 (after 1 year of change, clamped ≥ 0):")
-    for (i, j), rate in sorted(preview_year2.items()):
+    current_rates = step_rates(current_rates, delta_rates)
+
+    print("\nDemands (cells/year) — Year 1 (after 1 step of change, clamped ≥ 0):")
+    for (i, j), rate in sorted(current_rates.items()):
         print(f"    -> {i} → {j}: {rate}")
 
     for year_idx in range(final_year - initial_year):
         # Choose rates for this simulation step
-        use_rates = current_rates  # year_idx == 0 uses baseline; afterward it's already evolved
+        use_rates = current_rates  # already includes the steps up to this year
 
         # Snapshot counts from previous map
         unique_old, counts_old = np.unique(current_built_up_map, return_counts=True)
@@ -218,7 +219,7 @@ def simulate_density_based_scenario(
         # Store class counts
         class_counts[current_year + 1] = [unique, counts]
 
-        # Evolve the rates for the *next* year (so Year 2 uses changed rates, Year 3 uses changed twice, etc.)
+        # Evolve the rates for the next year
         current_rates = step_rates(current_rates, delta_rates)
 
     return simulated_maps, output_paths, class_counts
