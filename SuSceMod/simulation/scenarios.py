@@ -168,14 +168,16 @@ def simulate_density_based_scenario(
 ): 
     """
     Density-based scenario: the demand changes every year by a fixed amount, which follows
-    the trend between two historical periods. Demand never goes below zero.
+    the trend between two historical periods. The first step is already applied in the first
+    simulated year (year k uses annual_rates + k * differential_change_rates). Demand never goes below zero.
 
     Args:
         initial_year, final_year: simulates the years initial_year + 1 to final_year
         initial_built_up_map: 2D float array of density classes, NaN outside the study area
         prob_maps_dict: Dict[(from, to)] -> 2D suitability array, normalised to [0, 1]
         annual_rates: Dict[(from, to)] -> demand in cells per year
-        differential_change_rates: Dict[(from, to)] -> change in demand per year, can be negative
+        differential_change_rates: Dict[(from, to)] -> change of the demand per year (cells per year, per year),
+            can be negative, e.g. from calculate_change_rates_historical
         output_folder: folder the simulated maps are meant to be saved in; used to build output_paths
         randomness: "none" | "gumbel" | "jitter", see update_built_up_map
         seed: seed of the random generator, which is created once for the whole run
@@ -192,8 +194,8 @@ def simulate_density_based_scenario(
     # Interpret 'differential_change_rates' as signed per-year deltas (change rates)
     delta_rates = {k: float(v) for k, v in (differential_change_rates or {}).items()}
 
-    # Start from the given baseline for Year 1
-    current_rates = {k: float(v) for k, v in annual_rates.items()}
+    # Start from the given baseline (the rates of the last observed period)
+    current_rates ={k: float(v) for k, v in annual_rates.items()}
 
     # Helper: advance rates by one year using the per-year deltas, clamp to >= 0
     def step_rates(prev, delta):
@@ -206,21 +208,22 @@ def simulate_density_based_scenario(
             nxt[k] = new_val
         return nxt
 
-    # Print the baseline and the first changed rates
-    print("\nDemands (cells/year) - Year 1 (baseline):")
+    # The first step is already applied in Year 1 (demand of year k = baseline + k * change, clamped to >= 0)
+    print("\nBaseline demands (cells/year):")
     for (i, j), rate in sorted(current_rates.items()):
         print(f"    {i} -> {j}: {rate}")
 
-    preview_year2 = step_rates(current_rates, delta_rates)
-    print("\nDemands (cells/year) - Year 2 (after 1 year of change, clamped to >= 0):")
-    for (i, j), rate in sorted(preview_year2.items()):
+    current_rates = step_rates(current_rates, delta_rates)
+
+    print("\nDemands (cells/year) - Year 1 (after 1 step of change, clamped to >= 0):")
+    for (i, j), rate in sorted(current_rates.items()):
         print(f"    {i} -> {j}: {rate}")
 
     rng = np.random.default_rng(seed)
 
     for year_idx in range(final_year - initial_year):
         # Choose rates for this simulation step
-        use_rates = current_rates  # year_idx == 0 uses baseline; afterward it's already evolved
+        use_rates = current_rates  # already includes the steps up to this year
 
         # Snapshot counts from previous map
         unique_old, counts_old = np.unique(current_built_up_map, return_counts=True)
